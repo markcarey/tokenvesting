@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.4;
+pragma solidity ^0.8.0;
+
+import "hardhat/console.sol";
 
 import {
     ISuperfluid,
@@ -14,24 +16,29 @@ import {
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-abstract contract FluidVesting is Ownable {
+import "@openzeppelin/contracts/proxy/Clones.sol";
 
+contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     using SafeMath for uint256;
 
-    enum RecipientState { Registered, Flowing, Stopped }
+    enum FlowState { Registered, Flowing, Stopped }
     
-    struct FlowRecipient {
+    struct Flow {
         address recipient;
-        uint256 flowRate;
+        int96 flowRate;
         bool permanent;
-        RecipientState state;
+        FlowState state;
+        uint256 cliffEnd;
+        uint256 vestingDuration;
+        uint256 starttime;
     }
 
     event FlowStopped(
         address recipient,
-        uint256 flowRate,
+        int96 flowRate,
         bool wasPermanent
     );
 
@@ -39,33 +46,51 @@ abstract contract FluidVesting is Ownable {
     IConstantFlowAgreementV1 _cfa;
     ISuperToken public acceptedToken;
    
-    mapping(address => FlowRecipient) _recipients;
-    mapping(address => bool) _permanentRecipients;
-    mapping(address => bool) _impermanentRecipients;
-    mapping(address => uint256) _recipientLastStopped;
-    mapping(address => uint256) _recipientToPauseDuration;
+    address[] recipientAddresses;
+    mapping(address => Flow[]) _recipients;
+    mapping(address => int96) flowRates;
+
+    bytes32 public constant MANAGER = keccak256("MANAGER_ROLE");
+    bytes32 public constant GRANTOR = keccak256("GRANTOR_ROLE");
+    bytes32 public constant CLOSER = keccak256("CLOSER_ROLE");
    
     address admin;
-    uint256 public cliffEnd;
-    uint256 public starttime;
-    uint256 public vestingDuration;
-    bool public vestingActive;
 
-    constructor(ISuperfluid host, IConstantFlowAgreementV1 cfa, ISuperToken _acceptedToken, uint256 _cliffEnd, uint256 _vestingDuration) {
-        require(address(host) != address(0), "host is zero address");
-        require(address(cfa) != address(0), "cfa is zero address");
+    function initialize(
+        address _acceptedToken,
+        address owner
+    ) public virtual initializer {
         require(address(_acceptedToken) != address(0), "acceptedToken is zero address");
-        require(_vestingDuration > 0, "vestingDuration must be larger than 0");
+        __AccessControl_init_unchained();
+        __AccessControlEnumerable_init_unchained();
 
-        if(_cliffEnd == 0) _cliffEnd = block.timestamp;
-        _host = host;
-        _cfa = cfa;
-        acceptedToken = _acceptedToken;
-        cliffEnd = _cliffEnd;
-        vestingDuration = _vestingDuration;
-        admin = msg.sender;
+        console.log("chainid", block.chainid);
+        if ( block.chainid == 137 ) {
+            _host = ISuperfluid(0x3E14dC1b13c488a8d5D310918780c983bD5982E7);
+            _cfa = IConstantFlowAgreementV1(0x6EeE6060f715257b970700bc2656De21dEdF074C);
+        }
+        if ( block.chainid == 80001 || block.chainid == 31337 ) {
+            _host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
+            _cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
+        }
 
-        initializeRecipients();
+        // Mumbai: change this!!!
+        _host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
+        _cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
+
+
+        acceptedToken = ISuperToken(_acceptedToken);
+        admin = owner;
+
+        //Access Control
+        console.log("before any role granting");
+        //_setupRole(DEFAULT_ADMIN_ROLE, address(this));
+        console.log("before grant default to admin");
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        console.log("after granting DEFAULT admin role");
+        _setupRole(MANAGER, admin);
+        _setupRole(GRANTOR, admin);
+        _setupRole(CLOSER, admin);
     }
 
     modifier onlyAdmin() {
@@ -83,358 +108,244 @@ abstract contract FluidVesting is Ownable {
         _;
     }
 
-    
-
-    function initializeRecipients() virtual internal;
-
-    
-
-    function launchVesting(address[] calldata recipientAddresses) public onlyOwner {
-
-        require(block.timestamp > cliffEnd, "Cliff period not ended.");
-
-        
-
+    function launchVesting(address[] calldata recipientAddresses) public onlyRole(MANAGER) {
+        console.log("start launchVesting");
         for(uint i = 0; i < recipientAddresses.length; i++) {
-
-            openStream(recipientAddresses[i]);
-
-        }
-
-        
-
-        if(!vestingActive) {
-
-            starttime = block.timestamp;
-
-            vestingActive = true;
-
-        }
-
-    }
-
-    
-
-    function openStream(address recipient) internal {
-
-        _host.callAgreement(
-
-            _cfa,
-
-            abi.encodeWithSelector(
-
-                _cfa.createFlow.selector,
-
-                acceptedToken,
-
-                recipient,
-
-                _recipients[recipient].flowRate,
-
-                new bytes(0)
-
-            ),
-
-            new bytes(0)
-
-        );
-
-        
-
-        _recipients[recipient].state = RecipientState.Flowing;
-
-    }
-
-    
-
-    function resumeStream() public {
-
-        if(isRecipientRegistered(msg.sender) && isPermanentRecipient(msg.sender)) {
-
-            
-
-            openStream(msg.sender);
-
-            
-
-            if(_recipientLastStopped[msg.sender] > 0) {
-
-                uint256 lastPauseDuration = block.timestamp.sub(_recipientLastStopped[msg.sender]);
-
-                _recipientToPauseDuration[msg.sender] = _recipientToPauseDuration[msg.sender].add(lastPauseDuration);
-
-                _recipientLastStopped[msg.sender] = 0;
-
+            address addr = recipientAddresses[i];
+            console.log("starting on address ", addr);
+            Flow[] memory flows = _recipients[addr];
+            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+                console.log("starting on flow with flowIndex", flowIndex);
+                if (block.timestamp > flows[flowIndex].cliffEnd) {
+                    console.log("before createOrUpdate");
+                    createOrUpdateStream(recipientAddresses[i], flowIndex);
+                }
             }
+        }
+    }
 
+    function createOrUpdateStream(address recipient, uint256 flowIndex) internal {
+        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
+        if (outFlowRate == 0) {
+            if (recipient != address(this)) {
+                openStream(recipient, flowIndex);
+            }
+        } else {
+            // increase the outflow by flowRate
+            updateStream(recipient, flowIndex, outFlowRate + _recipients[recipient][flowIndex].flowRate);
+        }
+    }
+
+    function openStream(address recipient, uint256 i) internal {
+        _host.callAgreement(
+            _cfa,
+            abi.encodeWithSelector(
+                _cfa.createFlow.selector,
+                acceptedToken,
+                recipient,
+                _recipients[recipient][i].flowRate,
+                new bytes(0)
+            ),
+            new bytes(0)
+        );
+        _recipients[recipient][i].state = FlowState.Flowing;
+        if (_recipients[recipient][i].starttime == 0) {
+            _recipients[recipient][i].starttime = block.timestamp;
+        }
+        flowRates[recipient] = _recipients[recipient][i].flowRate;
+    }
+
+    function updateStream(address recipient, uint256 i, int96 newFlowRate) internal {
+        _host.callAgreement(
+            _cfa,
+            abi.encodeWithSelector(
+                _cfa.updateFlow.selector,
+                acceptedToken,
+                recipient,
+                newFlowRate,
+                new bytes(0)
+            ),
+            new bytes(0)
+        );
+        _recipients[recipient][i].state = FlowState.Flowing;
+        if (_recipients[recipient][i].starttime == 0) {
+            _recipients[recipient][i].starttime = block.timestamp;
+        }
+        flowRates[recipient] = newFlowRate;
+    }
+
+    function closeVesting(address[] calldata recipientAddresses) public onlyRole(CLOSER) {
+        for(uint i = 0; i < recipientAddresses.length; i++) {
+            address addr = recipientAddresses[i];
+            Flow[] memory flows = _recipients[addr];
+            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+                if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
+                    closeOrUpdateStream(addr, flowIndex);
+                }
+            }
+        }
+    }
+
+    function closeOrUpdateStream(address recipient, uint256 flowIndex) internal {
+        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
+        if (outFlowRate == _recipients[recipient][flowIndex].flowRate) {
+            closeStream(recipient, flowIndex);
+        } else if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
+            // decrease the outflow by flowRate
+            updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
+        }
+    }
+
+    function closeStream(address recipient, uint256 flowIndex) public onlyRole(CLOSER) {
+        require(_recipients[recipient][flowIndex].state == FlowState.Flowing, "Stream inactive");
+
+        if(elapsedTime(recipient, flowIndex) < _recipients[recipient][flowIndex].vestingDuration) {
+            require(!isPermanentFlow(recipient, flowIndex), "Stream is permanent and cannot be closed.");
+        }
+
+        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
+        if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
+            // decrease the outflow by flowRate
+            updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
         } else {
 
-            revert("Only Stream Recipient can reopen the stream.");
+            _host.callAgreement(
+                _cfa,
+                abi.encodeWithSelector(
+                    _cfa.deleteFlow.selector,
+                    acceptedToken,
+                    address(this),
+                    recipient,
+                    new bytes(0)
+                ),
+                new bytes(0)
+            );
 
+            flowRates[recipient] = 0;
+            _recipients[recipient][flowIndex].state = FlowState.Stopped;
+            emit FlowStopped(recipient,  _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
         }
-
     }
 
-    
-
-    function elapsedTime() public view returns (uint256) {
-
-        require(starttime > 0, "Vesting has not yet started.");
-
-        return block.timestamp.sub(starttime);
-
+    function elapsedTime(address recipient, uint256 flowIndex) public view returns (uint256) {
+        require(_recipients[recipient][flowIndex].starttime > 0, "Vesting has not yet started.");
+        return block.timestamp.sub(_recipients[recipient][flowIndex].starttime);
     }
 
-
-
-    function estimateElapsedTokens(address recipient) public view onlyAdmin returns (uint256) {
-
-        require(vestingActive, "Vesting inactive");
-
-        
-
-        uint256 durationEstimate = block.timestamp
-
-                                    .sub(starttime)
-
-                                    .mul(_recipients[recipient].flowRate);
-
-        uint256 pauseEstimate = _recipientToPauseDuration[recipient].mul(_recipients[recipient].flowRate);
-
-        
-
-        return durationEstimate.sub(pauseEstimate);
-
+    function estimateElapsedTokens(address recipient) public view onlyRole(MANAGER) returns (uint256[] memory) {
+        uint256[] memory tokens;
+        Flow[] memory flows = _recipients[recipient];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            uint256 durationEstimate = block.timestamp
+                                        .sub(_recipients[recipient][flowIndex].starttime)
+                                        .mul(toUint256(_recipients[recipient][flowIndex].flowRate));
+            tokens[flowIndex] = durationEstimate;
+        }
+        return tokens;
     }
 
-    
-
-    function estimateTotalTokens(address recipient) public onlyAdmin view returns (uint256) {
-
-        return vestingDuration.mul(_recipients[recipient].flowRate);
-
+    function estimateTotalTokens(address recipient) public onlyRole(MANAGER) view returns (uint256[] memory) {
+        uint256[] memory tokens;
+        Flow[] memory flows = _recipients[recipient];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            tokens[flowIndex] = _recipients[recipient][flowIndex].vestingDuration.mul(toUint256(_recipients[recipient][flowIndex].flowRate));
+        }
     }
 
-    
-
-    function estimateRemainingTokens(address recipient) public onlyAdmin  view returns (uint256) {
-
-        return estimateTotalTokens(recipient).sub(estimateElapsedTokens(recipient));
-
+    function estimateRemainingTokens(address recipient) public onlyRole(MANAGER)  view returns (uint256[] memory) {
+        uint256[] memory tokens;
+        Flow[] memory flows = _recipients[recipient];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            uint256 totalTokens = _recipients[recipient][flowIndex].vestingDuration.mul(toUint256(_recipients[recipient][flowIndex].flowRate));
+            uint256 elapsedTokens = block.timestamp
+                                        .sub(_recipients[recipient][flowIndex].starttime)
+                                        .mul(toUint256(_recipients[recipient][flowIndex].flowRate));
+            tokens[flowIndex] = totalTokens.sub(elapsedTokens);
+        }
+        return tokens;
     }
 
-    
-
-    function getFlowRecipient(address adr) public onlyAdmin view returns (FlowRecipient memory) {
-
+    // now this returns an array of {Flow}s
+    function getFlowRecipient(address adr) public onlyRole(MANAGER) view returns (Flow[] memory) {
         return _recipients[adr];
-
     }
 
-    
-
-    function registerRecipient(address adr, uint256 flowRate, bool isPermanent) public onlyOwner notRegistered(adr) returns (FlowRecipient memory) {
-
-        FlowRecipient memory newRecipient = FlowRecipient(adr, flowRate, isPermanent, RecipientState.Registered);
-
-        _recipients[adr] = newRecipient;
-
-        
-
-        return newRecipient;
-
+    function getAllAddresses() public onlyRole(MANAGER) view returns (address[] memory) {
+        return recipientAddresses;
     }
 
-    
+    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration) public onlyRole(GRANTOR) returns (Flow memory) {
+        Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0);
+        if (_recipients[adr].length == 0) {
+            recipientAddresses.push(adr);
+        }
+        _recipients[adr].push(newFlow);
+        return newFlow;
+    }
 
     function isRecipientRegistered(address adr) internal view returns (bool) {
-
-        return _recipients[adr].recipient != address(0);
-
+        return _recipients[adr].length > 0;
     }
 
-    
-
-    function isPermanentRecipient(address adr) internal registeredRecipient(adr) view returns (bool) {
-
-        return _recipients[adr].permanent;
-
+    function isPermanentFlow(address adr, uint256 flowIndex) internal registeredRecipient(adr) view returns (bool) {
+        return _recipients[adr][flowIndex].permanent;
     }
 
-    
+    // converts a flowRate from int96 to uint256 for math purposes
+    function toUint256(int96 flowRate) internal view returns (uint256) {
+        return uint256(uint96(flowRate));
+    }
 
     function flowTokenBalance() public view returns (uint256) {
-
         return acceptedToken.balanceOf(address(this));
-
     }
 
-
-
-    function withdraw(IERC20 token, uint256 amount) public onlyOwner {
-
+    function withdraw(IERC20 token, uint256 amount) public onlyRole(MANAGER) {
         require(amount <= token.balanceOf(address(this)), "Withdrawal amount exceeds balance");
-
-
-
         bool transferSuccess = token.transfer(msg.sender, amount);
-
         if(!transferSuccess) revert("Token transfer failed");
-
     }
 
 }
 
 
+contract VestingFactory {
+    address immutable tokenImplementation;
+    address owner;
+    address[] public allVestors;
+    mapping(address => address[]) userToVestors;
+    mapping(address => address) ownerOfVestor;
 
-contract InvestorsVesting is FluidVesting {
 
-
-
-    constructor(ISuperfluid host, IConstantFlowAgreementV1 cfa, ISuperToken _acceptedToken, uint256 _cliffEnd, uint256 _vestingDuration) FluidVesting(host, cfa, _acceptedToken, _cliffEnd, _vestingDuration) {}
-
-    
-
-    function initializeRecipients() internal override {
-
-        // Investors (36 months)
-
-        registerRecipient(0x08AAE6A5979625F2173f1C31A3417251B2386777, 317097919800000, true);
-
-        registerRecipient(0x6b339824883E59676EA605260E4DdA71DcCA29Ae, 158548959900000, true);
-
-        registerRecipient(0xC71F1e087AadfBaE3e8578b5eFAFDeC8aFA95a16, 1268391679000000, true);
-
-        registerRecipient(0x54a55291aF851f5d439536889eeF191B81D3c091, 4756468798000000, true);
-
-        registerRecipient(0x51787a2C56d710c68140bdAdeFD3A98BfF96FeB4, 317097919800000, true);
-
-        registerRecipient(0x6d16749cEfb3892A101631279A8fe7369A281D0E, 634195839700000, true);
-
-        registerRecipient(0x91ec125BC831ab9985DAec9a52fa98b2825F0b84, 158548959900000, true);
-
-        registerRecipient(0x96481CB0fCd7673254eBccC42DcE9B92da10ea04, 317097919800000, true);
-
-        registerRecipient(0xbB6EEfC580453f68f04d7f29C82b6BA71D25eacB, 158548959900000, true);
-
-        registerRecipient(0x30B48995C89cc09e6d1dA2d97Ca384249e289285, 63419583970000, true);
-
-        registerRecipient(0x0caCf3518029666703c08aB7f1F9AD1Aca4C38D1, 317097919800000, true);
-
+    constructor() public {
+        tokenImplementation = address(new TokenVestor());
+        owner = msg.sender;
     }
 
-}
+    event VestorCreated(
+        address indexed _owner,
+        address _contract,
+        uint
+    );
 
-
-
-contract TeamVesting is FluidVesting {
-
-
-
-    constructor(ISuperfluid host, IConstantFlowAgreementV1 cfa, ISuperToken _acceptedToken, uint256 _cliffEnd, uint256 _vestingDuration) FluidVesting(host, cfa, _acceptedToken, _cliffEnd, _vestingDuration) {}
-
-    
-
-    function initializeRecipients() internal override {
-
-        // Team (48 months)
-
-        registerRecipient(0x9BBD23d2A0e8078e5f17827f4b25baB18E0fc432, 3170979198000000, true);
-
-        registerRecipient(0x3FA26ceeD3bb6c68b9a82bDE411eE2DAF3aE78E3, 3170979198000000, true);
-
-        registerRecipient(0xaA38dDc7411462A195c9a8020aab1A04E8672B6B, 3170979198000000, true);
-
-        registerRecipient(0xAe9DB1fF69cfCa2720fF2e5d81807d7383138A39, 3963723998000000, true);
-
-        registerRecipient(0x6960CcbAe6A13813618f275B10EE0FB55271ce1D, 396372399800000, true);
-
+    function createVestor(address _token) external returns (address) {
+        address clone = Clones.clone(tokenImplementation);
+        TokenVestor(clone).initialize(_token, msg.sender);
+        allVestors.push(clone);
+        userToVestors[msg.sender].push(clone);
+        ownerOfVestor[clone] = msg.sender;
+        emit VestorCreated(msg.sender, clone, allVestors.length);
+        return clone;
     }
 
-}
-
-
-
-contract StoppableVesting is FluidVesting {
-
-
-
-    constructor(ISuperfluid host, IConstantFlowAgreementV1 cfa, ISuperToken _acceptedToken, uint256 _cliffEnd, uint256 _vestingDuration) FluidVesting(host, cfa, _acceptedToken, _cliffEnd, _vestingDuration) {}
-
-    
-
-    function initializeRecipients() internal override {
-
-        // Stoppable (48 months, no cliff)
-
-        registerRecipient(0x474B73e8966D61999B1f829704337C0133F77b56, 396372399800000, false);
-
+    // returns array of all TokenVestor contract addresses
+    function getAllVestors() public view returns (address[] memory){
+       return allVestors;
     }
 
-    
-
-    function closeVesting(address[] calldata recipientAddresses) public onlyOwner {
-
-        require(vestingActive, "Vesting not started");
-
-        require(elapsedTime() > vestingDuration, "Vesting duration has not expired yet.");
-
-        
-
-        for(uint i = 0; i < recipientAddresses.length; i++) {
-
-            closeStream(recipientAddresses[i]);
-
-        }
-
-    }
-
-    
-
-    function closeStream(address recipient) public onlyOwner {
-
-        require(_recipients[recipient].state == RecipientState.Flowing, "Stream inactive");
-
-        
-
-        if(elapsedTime() < vestingDuration) {
-
-            require(!isPermanentRecipient(recipient), "Stream for this receiver is permanent and cannot be closed.");
-
-        }
-
-        
-
-        _host.callAgreement(
-
-            _cfa,
-
-            abi.encodeWithSelector(
-
-                _cfa.deleteFlow.selector,
-
-                acceptedToken,
-
-                address(this),
-
-                recipient,
-
-                new bytes(0)
-
-            ),
-
-            new bytes(0)
-
-        );
-
-
-
-        _recipients[recipient].state = RecipientState.Stopped;
-
-        _recipientLastStopped[recipient] = block.timestamp;
-
-        emit FlowStopped(recipient,  _recipients[recipient].flowRate, isPermanentRecipient(recipient));
-
+    // returns array of all Garden contract addresses for a specified user address
+    function getVestorsForUser(address user) public view returns (address[] memory){
+       return userToVestors[user];
     }
 
 }
