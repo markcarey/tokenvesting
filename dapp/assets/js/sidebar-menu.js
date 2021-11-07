@@ -4,9 +4,9 @@ $(".toggle-nav").click(function () {
 $(".mobile-back").click(function () {
     $('#sidebar-links .nav-menu').css("left", "-410px");
 });
-$(".page-wrapper").attr("class", "page-wrapper " + localStorage.getItem('page-wrapper'));
+//$(".page-wrapper").attr("class", "page-wrapper " + localStorage.getItem('page-wrapper'));
 if (localStorage.getItem("page-wrapper") === null) {
-    $(".page-wrapper").addClass("compact-wrapper");
+    //$(".page-wrapper").addClass("compact-wrapper");
 }
 
 // left sidebar and vertical menu
