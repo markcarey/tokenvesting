@@ -225,7 +225,7 @@ $( document ).ready(function() {
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
     });
 
-    $("#createVestor").click(async function(){
+    $("#wrap").click(async function(){
         var $tab = $(this).parents(".tab");
         status("deploying vesting contract for " + underlyingSymbol + "x...");
         const decimals = underlyingDecimals;
