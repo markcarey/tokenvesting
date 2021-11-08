@@ -215,7 +215,7 @@ $( document ).ready(function() {
         //console.log(txHash);
         var pendingTxHash = txHash;
 
-        var provider = ethers.providers.JsonRpcProvider();
+        var provider = new ethers.providers.JsonRpcProvider();
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var data = await ethersSTF.filters.SuperTokenCreated();
         console.log(data);
