@@ -150,7 +150,7 @@ $( document ).ready(function() {
         return false;
     });
 
-    $("#chooseUnderlying").click(function(){
+    $("#chooseUnderlying").click(async function(){
         var $tab = $(this).parents(".tab");
         var underlying = $("#underlying").val();
         var wrapIt = false;
