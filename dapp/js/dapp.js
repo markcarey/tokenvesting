@@ -3,9 +3,9 @@ var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 const factoryAddress = "0x0Fd7Bcb003C166cb8d09dA5771B9f5a5E7a41A26";
-const vestorAddress = "";
-const underlyingAddress = "";
-const superAddress = "";
+var vestorAddress = "";
+var underlyingAddress = "";
+var superAddress = "";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 var chain = "mumbai";
