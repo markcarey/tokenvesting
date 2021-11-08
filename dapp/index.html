@@ -162,13 +162,13 @@
             <div class="page-title">
               <div class="row">
                 <div class="col-6">
-                  <h3>Default</h3>
+                  <h3>Get Started</h3>
                 </div>
                 <div class="col-6">
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">                                       <i data-feather="home"></i></a></li>
                     <li class="breadcrumb-item">Dashboard</li>
-                    <li class="breadcrumb-item active">Default      </li>
+                    <li class="breadcrumb-item active">Get Started</li>
                   </ol>
                 </div>
               </div>
@@ -177,6 +177,75 @@
           <!-- Container-fluid starts-->
           <div class="container-fluid">
             <div class="row second-chart-list third-news-update">
+
+              <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Setup Token Vesting</h5><span></span>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-wizard" id="regForm" action="#" method="POST">
+                        <div class="tab" style="display: block;">
+                            <button class="btn btn-primary" id="connect" type="button"  title="">Connect</button>
+                        </div>
+                        <div class="tab">
+                          <div class="mb-3 m-t-15">
+                            <label for="exampleFormControlInput1">Email address</label>
+                            <input class="form-control" id="exampleFormControlInput1" type="email" placeholder="name@example.com" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label for="exampleInputPassword1">Password</label>
+                            <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Password" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label for="exampleInputPassword1">Confirm Password</label>
+                            <input class="form-control" id="exampleInputcPassword1" type="password" placeholder="Enter again" data-bs-original-title="" title="">
+                          </div>
+                        </div>
+                        <div class="tab">
+                          <div class="mb-3">
+                            <label for="exampleFormControlInput1">Birthday:</label>
+                            <input class="form-control" type="date" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label class="control-label">Age</label>
+                            <input class="form-control" placeholder="Age" type="text" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label class="control-label">Have Passport</label>
+                            <input class="form-control" placeholder="Yes/No" type="text" data-bs-original-title="" title="">
+                          </div>
+                        </div>
+                        <div class="tab">
+                          <div class="mb-3">
+                            <label class="control-label">Country</label>
+                            <input class="form-control mt-1" type="text" placeholder="Country" required="required" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label class="control-label">State</label>
+                            <input class="form-control mt-1" type="text" placeholder="State" required="required" data-bs-original-title="" title="">
+                          </div>
+                          <div class="mb-3">
+                            <label class="control-label">City</label>
+                            <input class="form-control mt-1" type="text" placeholder="City" required="required" data-bs-original-title="" title="">
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-end btn-mb">
+                            <button class="btn btn-secondary" id="prevBtn" type="button" onclick="nextPrev(-1)" style="display: none;" data-bs-original-title="" title="">Previous</button>
+                            <button class="btn btn-primary" id="nextBtn" type="button" onclick="nextPrev(1)" data-bs-original-title="" title="">Next</button>
+                          </div>
+                        </div>
+                        <!-- Circles which indicates the steps of the form:-->
+                        <div class="text-center"><span class="step active"></span><span class="step"></span><span class="step"></span><span class="step"></span></div>
+                        <!-- Circles which indicates the steps of the form:-->
+                        <!-- Container-fluid Ends-->
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+
               <div class="col-xl-4 col-lg-12 xl-50 morning-sec box-col-12">
                 <div class="card o-hidden profile-greeting">
                   <div class="card-body">
