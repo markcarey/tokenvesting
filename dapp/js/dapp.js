@@ -5,6 +5,8 @@ var BN = web3.utils.BN;
 const factoryAddress = "0x0Fd7Bcb003C166cb8d09dA5771B9f5a5E7a41A26";
 var vestorAddress = "";
 var underlyingAddress = "";
+var underlyingSymbol = "";
+var underlyingDecimals = 18;
 var superAddress = "";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
@@ -159,7 +161,9 @@ $( document ).ready(function() {
             underlyingAddress = $("underlyingCustom").val();
             const token = new web3.eth.Contract(tokenABI, underlyingAddress);
             symbol = await token.methods.symbol().call();
+            underlyingDecimals = await token.methods.decimals().call();
             if ( symbol ) {
+                underlyingSymbol = symbol;
                 var resolved = await resolver.methods.get("supertokens.v1." + symbol + "x").call();
                 console.log(resolved);
                 if ( resolved == "0x0000000000000000000000000000000000000000" ) {
@@ -171,6 +175,7 @@ $( document ).ready(function() {
                 // TODO: throw error
             }
         } else {
+            underlyingSymbol = underlying;
             underlyingAddress = addr[underlying];
             if ( underlying + 'x' in addr ) {
                 superAddress = addr[underlying + 'x'];
@@ -180,10 +185,62 @@ $( document ).ready(function() {
         }
         if ( wrapIt ) {
             log("need transaction to create wrapper for " + symbol);
+            $("#wrap").text("Create Super Token for " + underlyingSymbol);
+            $tab.hide().next().show();
         } else {
             log("wrapper exists");
+            // skip one
+            $tab.hide().next().next().show();
+            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         }
         return false;
+    });
+
+    $("wrap").click(async function(){
+        status("creating super token...");
+        const decimals = underlyingDecimals;
+        const superTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': addr.SuperTokenFactory,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': superTokenFactory.methods.createERC20Wrapper(underlyingAddress, decimals, 2, "Super " + underlyingSymbol, underlyingSymbol + "x").encodeABI()
+        };
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        //console.log(txHash);
+        var pendingTxHash = txHash;
+        web3.eth.subscribe('newBlockHeaders', async (error, event) => {
+            if (error) {
+                console.log("error", error);
+            }
+            const blockTxHashes = (await web3.eth.getBlock(event.hash)).transactions;
+
+            if (blockTxHashes.includes(pendingTxHash)) {
+                web3.eth.clearSubscriptions();
+                status("Super token created!")
+                // TODO: get address of new super token
+                var subscription = web3.eth.subscribe('logs', {
+                    address: addr.SuperTokenFactory,
+                    topics: ["0xb52c6d9d122e8c07769b96d7bb14e66db58ee03fdebaaa2f92547e9c7ef0e65f"]
+                }, function(error, result){
+                    if (!error)
+                        console.log(result);
+                })
+                .on("connected", function(subscriptionId){
+                    //console.log(subscriptionId);
+                })
+                .on("data", function(log){
+                    console.log(log);
+                    var event = web3.eth.abi.decodeParameters(['address'], log.data);
+                    console.log(event);
+                });
+            }
+        });
     });
 
     $(".connect").click(function(){
