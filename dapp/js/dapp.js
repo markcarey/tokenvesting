@@ -208,6 +208,7 @@ $( document ).ready(function() {
             'nonce': "" + nonce,
             'data': superTokenFactory.methods.createERC20Wrapper(underlyingAddress, decimals, 2, "Super " + underlyingSymbol, underlyingSymbol + "x").encodeABI()
         };
+        const block = web3.eth.getBlockNumber();
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
             params: [tx],
@@ -218,7 +219,7 @@ $( document ).ready(function() {
         var provider = new ethers.providers.JsonRpcProvider();
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
-        var events = await ethersSTF.on(filter);
+        var events = await ethersSTF.queryFilter(filter, block, 'latest');
         console.log(events);
 
 
