@@ -4,10 +4,42 @@ var BN = web3.utils.BN;
 
 const factoryAddress = "0x0Fd7Bcb003C166cb8d09dA5771B9f5a5E7a41A26";
 const vestorAddress = "";
+const underlyingAddress = "";
+const superAddress = "";
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
-const wethAddress = "0x3C68CE8504087f89c640D02d133646d98e64ddd9"; // Mumbai
-//const wethAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";  // Mainnet (fork)
-const WETH = new web3.eth.Contract(tokenABI, wethAddress);
+
+var chain = "mumbai";
+var addr = {};
+if (chain == "mumbai")
+    //Mumbai:
+    addr.Resolver = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
+    addr.SuperTokenFactory = "0x200657E2f123761662567A1744f9ACAe50dF47E6";
+    addr.SuperHost = "0xEB796bdb90fFA0f28255275e16936D25d3418603";
+    addr.WETH = "0x3C68CE8504087f89c640D02d133646d98e64ddd9";
+    addr.DAI = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
+    addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
+    addr.ETHx = "0xC64A23013768E0BE8751Fd6a2381624194Edb6A6"; 
+    addr.WETHx = addr.ETHx;
+
+}
+if (chain == "polygon") {
+    //Polygon
+    addr.Resolver = "0xE0cc76334405EE8b39213E620587d815967af39C";
+    addr.SuperTokenFactory = "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34";
+    addr.SuperHost = "0x3E14dC1b13c488a8d5D310918780c983bD5982E7";
+    addr.WETH = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
+    addr.DAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+    addr.USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+    addr.ETHx = "0x27e1e4E6BC79D93032abef01025811B7E4727e85";
+    addr.WETHx = addr.ETHx;
+    addr.USDCx = "0xCAa7349CEA390F89641fe306D93591f87595dc1F";
+    addr.WBTC = "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6";
+    addr.WBTCx = "0x4086eBf75233e8492F1BCDa41C7f2A8288c2fB92";
+    addr.DAIx = "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2";
+}
+
+const WETH = new web3.eth.Contract(tokenABI, addr.WETH); // need this?
+const resolver = new web3.eth.Contract(resolverABI, addr.Resolver);
 
 var gas = web3.utils.toHex(new BN('2000000000')); // 2 Gwei;
 var dappChain = 80001; // default to Mumbai
@@ -116,6 +148,38 @@ $( document ).ready(function() {
             $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
         
+        return false;
+    });
+
+    $("#chooseUnderlying").click(function(){
+        var $tab = $(this).parents(".tab");
+        var underlying = $("#underlying").val();
+        var wrapIt = false;
+        var symbol = "";
+        if ( underlying == "other" ) {
+            underlyingAddress = $("underlyingCustom").val();
+            const token = new web3.eth.Contract(tokenABI, underlyingAddress);
+            symbol = await token.methods.symbol().call();
+            if ( symbol ) {
+                var resolved = await resolver.methods.get("supertokens.v1." + symbol + "x").call();
+                console.log(resolved);
+                if ( resolved == "0x0000000000000000000000000000000000000000" ) {
+                    wrapIt = true;
+                } else {
+                    superAddress = resolved;
+                }
+            } else {
+                // TODO: throw error
+            }
+        } else {
+            underlyingAddress = addr[underlying];
+            superAddress = addr[underlying + 'x'];
+        }
+        if ( wrapIt ) {
+            console("need transaction to create wrapper for " + symbol);
+        } else {
+            console.log("wrapper exists");
+        }
         return false;
     });
 
