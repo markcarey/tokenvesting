@@ -32,7 +32,7 @@ async function main() {
     accounts = await web3.eth.getAccounts();
     //connectWallet();
     if (accounts.length > 0) {
-        $("li.profile-nav").find("media-body span").text( abbrAddress() );
+        $("li.profile-nav").find(".media-body span").text( abbrAddress() );
         //$(".card-buttons button.connect").hide().next().show();
     }
 
@@ -81,7 +81,7 @@ async function connectWallet() {
                 // Metamask is ready to go!
                 //console.log(result);
                 accounts = result;
-                $("li.profile-nav").find("media-body span").text( abbrAddress() );
+                $("li.profile-nav").find(".media-body span").text( abbrAddress() );
                 status("Connected as " + abbrAddress() );
             })
             .catch(reason => {
