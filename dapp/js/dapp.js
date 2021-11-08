@@ -217,8 +217,9 @@ $( document ).ready(function() {
 
         var provider = new ethers.providers.JsonRpcProvider();
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
-        var data = await ethersSTF.filters.SuperTokenCreated();
-        console.log(data);
+        var filter = await ethersSTF.filters.SuperTokenCreated();
+        var events = await ethersSTF.on(filter);
+        console.log(events);
 
 
 
