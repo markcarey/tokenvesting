@@ -200,7 +200,7 @@ $( document ).ready(function() {
         var $tab = $(this).parents(".tab");
         status("creating super token...");
         const decimals = underlyingDecimals;
-        const SuperTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
+        const superTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
         const tx = {
             'from': ethereum.selectedAddress,
