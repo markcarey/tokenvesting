@@ -109,9 +109,10 @@ $( document ).ready(function() {
 
     $("#connect").click(function(){
         //wizard
+        var $tab = $(this).parents(".tab");
         connectWallet()
         .then(function(){
-            $(this).parents(".tab").hide().next().show();
+            $tab.hide().next().show();
             $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
         
