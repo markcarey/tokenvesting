@@ -220,7 +220,7 @@ $( document ).ready(function() {
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
         var events = await ethersSTF.queryFilter(filter, block, 'latest');
-        console.log(events);
+        console.log(events[0].args.token);
 
 
 

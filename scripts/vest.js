@@ -1807,7 +1807,7 @@ async function underlying(addr) {
  //resolve("SuperToken")
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
 
- underlying("0x200657E2f123761662567A1744f9ACAe50dF47E6")
+ underlying("0xAD8d6E74BA51AC6FC2EB19EE78D2375F27F067B8")
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
