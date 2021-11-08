@@ -112,7 +112,7 @@ $( document ).ready(function() {
         connectWallet()
         .then(function(){
             $(this).parent(".tab").hide().next().show();
-            $(#setup-wizard span.active).removeClass("active").next().addClass("active");
+            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
         
         return false;
