@@ -75,7 +75,7 @@ async function connectWallet() {
     status("Connecting...");
     if (window.ethereum) {
         //console.log("window.ethereum true");
-        window.ethereum
+        return window.ethereum
             .enable()
             .then(async result => {
                 // Metamask is ready to go!
@@ -109,8 +109,12 @@ $( document ).ready(function() {
 
     $("#connect").click(function(){
         //wizard
-        connectWallet();
-        //TODO: next step
+        connectWallet()
+        .then(function(){
+            $(this).parent(".tab").hide().next().show();
+            $(#setup-wizard span.active).removeClass("active").next().addClass("active");
+        });
+        
         return false;
     });
 

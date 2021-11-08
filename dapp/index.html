@@ -191,19 +191,23 @@
                           </div>
                         </div>
                         <div class="tab">
-                          <div class="mb-3 m-t-15">
-                            <label for="exampleFormControlInput1">Email address</label>
-                            <input class="form-control" id="exampleFormControlInput1" type="email" placeholder="name@example.com" data-bs-original-title="" title="">
-                          </div>
+                            <div class="mb-3">
+                              <label class="form-label" for="underlying">Token to Vest</label>
+                              <select class="form-select" id="underlying">
+                                <option value="DAI">DAI</option>
+                                <option value="USDC">USDC</option>
+                                <option value="WETH">WETH</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
                           <div class="mb-3">
-                            <label for="exampleInputPassword1">Password</label>
-                            <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Password" data-bs-original-title="" title="">
+                            <label for="underlyingCustom">Other:</label>
+                            <input class="form-control" id="underlyingCustom" type="text" placeholder="token address" data-bs-original-title="" title="">
                           </div>
-                          <div class="mb-3">
-                            <label for="exampleInputPassword1">Confirm Password</label>
-                            <input class="form-control" id="exampleInputcPassword1" type="password" placeholder="Enter again" data-bs-original-title="" title="">
+                          <div class="text-center" style="margin-bottom: 20px;">
+                              <button class="btn btn-primary" id="chooseUnderlying" type="button"  title="">Next</button>
                           </div>
-                        </div>
+
                         <div class="tab">
                           <div class="mb-3">
                             <label for="exampleFormControlInput1">Birthday:</label>
@@ -485,6 +489,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@alch/alchemy-web3@latest/dist/alchemyWeb3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="/js/abis.js?v=1"></script>
-    <script src="/js/dapp.js?v=5"></script>
+    <script src="/js/dapp.js?v=6"></script>
   </body>
 </html>
