@@ -172,7 +172,11 @@ $( document ).ready(function() {
             }
         } else {
             underlyingAddress = addr[underlying];
-            superAddress = addr[underlying + 'x'];
+            if ( underlying + 'x' in addr ) {
+                superAddress = addr[underlying + 'x'];
+            } else {
+                wrapIt = true;
+            }
         }
         if ( wrapIt ) {
             console("need transaction to create wrapper for " + symbol);
