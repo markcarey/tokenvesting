@@ -10,7 +10,7 @@ const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 
 var chain = "mumbai";
 var addr = {};
-if (chain == "mumbai")
+if (chain == "mumbai") {
     //Mumbai:
     addr.Resolver = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
     addr.SuperTokenFactory = "0x200657E2f123761662567A1744f9ACAe50dF47E6";
@@ -20,7 +20,6 @@ if (chain == "mumbai")
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
     addr.ETHx = "0xC64A23013768E0BE8751Fd6a2381624194Edb6A6"; 
     addr.WETHx = addr.ETHx;
-
 }
 if (chain == "polygon") {
     //Polygon
