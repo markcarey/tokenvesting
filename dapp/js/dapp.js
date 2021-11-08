@@ -220,38 +220,10 @@ $( document ).ready(function() {
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
         var events = await ethersSTF.queryFilter(filter, block, 'latest');
-        console.log(events[0].args.token);
-
-
-
-
-        web3.eth.subscribe('newBlockHeaders', async (error, event) => {
-            if (error) {
-                console.log("error", error);
-            }
-            const blockTxHashes = (await web3.eth.getBlock(event.hash)).transactions;
-
-            if (blockTxHashes.includes(pendingTxHash)) {
-                web3.eth.clearSubscriptions();
-                status("Super token created!")
-                // TODO: get address of new super token
-                var subscription = web3.eth.subscribe('logs', {
-                    address: addr.SuperTokenFactory,
-                    topics: ["0xb52c6d9d122e8c07769b96d7bb14e66db58ee03fdebaaa2f92547e9c7ef0e65f"]
-                }, function(error, result){
-                    if (!error)
-                        console.log(result);
-                })
-                .on("connected", function(subscriptionId){
-                    //console.log(subscriptionId);
-                })
-                .on("data", function(log){
-                    console.log(log);
-                    var event = web3.eth.abi.decodeParameters(['address'], log.data);
-                    console.log(event);
-                });
-            }
-        });
+        superAddress = events[0].args.token;
+        log("super token " + underlyingSymbol + "x created at " + superAddress);
+        $tab.hide().next().show();
+        $("#setup-wizard span.active").removeClass("active").next().addClass("active");
     });
 
     $(".connect").click(function(){
