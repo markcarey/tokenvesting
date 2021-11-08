@@ -199,8 +199,37 @@ $( document ).ready(function() {
     $("#wrap").click(async function(){
         var $tab = $(this).parents(".tab");
         status("creating super token...");
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': factoryAddress,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': factory.methods.createVestor(superAddress).encodeABI()
+        };
+        const block = web3.eth.getBlockNumber();
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        //console.log(txHash);
+        var pendingTxHash = txHash;
+
+        var provider = new ethers.providers.JsonRpcProvider();
+        const ethersSTF = new ethers.Contract(factoryAddress, factoryABI, provider);
+        var filter = await ethersSTF.filters.VestorCreated();
+        var events = await ethersSTF.queryFilter(filter, block, 'latest');
+        vestorAddress = events[0].args._contract;
+        log("Vestor created at " + vestorAddress);
+        $tab.hide().next().show();
+        $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+    });
+
+    $("#createVestor").click(async function(){
+        var $tab = $(this).parents(".tab");
+        status("deploying vesting contract for " + underlyingSymbol + "x...");
         const decimals = underlyingDecimals;
-        const superTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
+        const factory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
         const tx = {
             'from': ethereum.selectedAddress,
