@@ -179,9 +179,9 @@ $( document ).ready(function() {
             }
         }
         if ( wrapIt ) {
-            console("need transaction to create wrapper for " + symbol);
+            log("need transaction to create wrapper for " + symbol);
         } else {
-            console.log("wrapper exists");
+            log("wrapper exists");
         }
         return false;
     });
@@ -322,6 +322,11 @@ function wrongNetworkModal(ctx){
     </div>
     `;
     return html;
+}
+
+function log(message) {
+    console.log(message);
+    status(message);
 }
 
 function status(message) {
