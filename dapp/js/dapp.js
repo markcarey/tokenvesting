@@ -215,14 +215,14 @@ $( document ).ready(function() {
         //console.log(txHash);
         var pendingTxHash = txHash;
 
-        var provider = ethers.getDefaultProvider( ["http://localhost:8545"] );
+        var provider = ethers.providers.JsonRpcProvider();
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var data = await ethersSTF.filters.SuperTokenCreated();
         console.log(data);
 
 
 
-        
+
         web3.eth.subscribe('newBlockHeaders', async (error, event) => {
             if (error) {
                 console.log("error", error);
