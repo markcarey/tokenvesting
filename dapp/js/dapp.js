@@ -72,7 +72,7 @@ function correctChain() {
 }
 
 async function connectWallet() {
-    notify("Connecting...");
+    status("Connecting...");
     if (window.ethereum) {
         //console.log("window.ethereum true");
         window.ethereum
@@ -82,7 +82,7 @@ async function connectWallet() {
                 //console.log(result);
                 accounts = result;
                 $("li.profile-nav").find("media-body span").text( abbrAddress() );
-                notify("Connected as " + abbrAddress() );
+                status("Connected as " + abbrAddress() );
             })
             .catch(reason => {
                 // Handle error. Likely the user rejected the login.
@@ -252,7 +252,7 @@ function wrongNetworkModal(ctx){
     return html;
 }
 
-function notify(message) {
+function status(message) {
     $.notify({
         message: message
      },
