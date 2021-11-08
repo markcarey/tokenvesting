@@ -196,7 +196,7 @@ $( document ).ready(function() {
         return false;
     });
 
-    $("wrap").click(async function(){
+    $("#wrap").click(async function(){
         status("creating super token...");
         const decimals = underlyingDecimals;
         const superTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
