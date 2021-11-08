@@ -111,7 +111,7 @@ $( document ).ready(function() {
         //wizard
         connectWallet()
         .then(function(){
-            $(this).parent(".tab").hide().next().show();
+            $(this).parents(".tab").hide().next().show();
             $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
         
