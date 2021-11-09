@@ -331,7 +331,7 @@ $( document ).ready(function() {
         return false;
     });
 
-    $(".addFlow").click(async function(){
+    $("#addFlow").click(async function(){
         var $tab = $(this).parents(".tab");
         var wizard = false;
         var $button = $(this);
