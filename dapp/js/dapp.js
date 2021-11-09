@@ -143,23 +143,51 @@ async function afterConnection() {
                     columns: [
                         { 
                             title: "Address",
-                            data: "recipient"
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var addr = full.recipient;
+                                var short = abbrAddress(addr);
+                                return `<span title="${addr}">${short}</span>`;
+                            }
                         },
                         { 
                             title: "Flow Rate", 
-                            data: "flowRate"
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var flowRate = full.flowRate;
+                                flowRate = parseInt(flowRate) / ( 10**underlyingDecimals);
+                                flowRate = flowRate * 60*60*24;
+                                return flowRate.toFixed(2) + ` ${underlyingSymbol}x per day`;
+                            }
                         },
                         { 
                             title: "Start Date",
-                            data: "cliffEnd"
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var cliff = full.cliffEnd;
+                                return moment(cliff).format("YYYY-MM-DD");
+                            }
                         },
                         { 
                             title: "Duration",
-                            data: "vestingDuration"
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var dur = full.vestingDuration;
+                                dur = parseInt(dur) / (60*60*24);
+                                return dur.toFixed(1) + " days";
+                            }
                         },
                         { 
                             title: "Permanent",
-                            data: "permanent"
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var perm = full.permanent;
+                                if ( perm ) {
+                                    return "<i data-feather="check-cirlce"></i>";
+                                } else {
+                                    return "<i data-feather="x-circle"></i>";
+                                }
+                            }
                         },
                         { 
                             title: "Status",
