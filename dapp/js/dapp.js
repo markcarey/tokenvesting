@@ -341,11 +341,11 @@ $( document ).ready(function() {
         var flowAddress = $("#wizardAddress").val();
         var start = moment( $("#wizardStart").val() );
         var end = moment( $("#wizardEnd").val() );
-        var duration = end.diff(start);
+        var duration = end.unix() - start.unix();;
         console.log("duration", duration);
         var amount = $("#wizardFlowAmount").val();
         var seconds = $("#wizardFlowSeconds").val();
-        var flowRate = amount / seconds * ( 10**underlyingDecimals);
+        var flowRate = parseInt( amount / seconds * ( 10**underlyingDecimals) );
         console.log("flowRate", flowRate);
         var permanent = $("#wizardPermanent").val();
         console.log("permanent", permanent);
@@ -355,7 +355,7 @@ $( document ).ready(function() {
             'to': vestorAddress,
             'gasPrice': gas,
             'nonce': "" + nonce,
-            'data': vest.methods.registerFlow(flowAddress, flowRate, permanent, start.unix(), duration).encodeABI()
+            'data': vestor.methods.registerFlow(flowAddress, flowRate, permanent, start.unix(), duration).encodeABI()
         };
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
