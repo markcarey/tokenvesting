@@ -165,7 +165,7 @@ async function afterConnection() {
                             data: null,
                             render: function ( data, type, full, meta ) {
                                 var cliff = full.cliffEnd;
-                                return moment(new Date(cliff)).format("YYYY-MM-DD");
+                                return moment.unix(cliff).format("YYYY-MM-DD");
                             }
                         },
                         { 
