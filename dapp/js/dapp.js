@@ -268,6 +268,7 @@ $( document ).ready(function() {
     });
 
     $(".deposit").click(async function(){
+        var $tab = $(this).parents(".tab");
         var amt = 0;
         var wizard = false;
         var $button = $(this);
