@@ -150,7 +150,6 @@ $( document ).ready(function() {
             $tab.hide().next().show();
             $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
-        
         return false;
     });
 
@@ -234,6 +233,7 @@ $( document ).ready(function() {
         log("super token " + underlyingSymbol + "x created at " + superAddress);
         $tab.hide().next().show();
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        return false;
     });
 
     $("#createVestor").click(async function(){
@@ -265,6 +265,7 @@ $( document ).ready(function() {
         $tab.next().find("p.lead").text("Deposit " + underlyingSymbol + " into vesting contract");
         $tab.hide().next().show();
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        return false;
     });
 
     $(".deposit").click(async function(){
@@ -327,6 +328,41 @@ $( document ).ready(function() {
             approved = amt;
             status("Approved");
         }
+        return false;
+    });
+
+    $(".addFlow").click(async function(){
+        var $tab = $(this).parents(".tab");
+        var wizard = false;
+        var $button = $(this);
+        if ( $(this).data("form") == "wizard" ) {
+            wizard = true;
+        }
+        var flowAddress = $("#wizardAddress").val();
+        var start = moment( $("#wizardStart").val() );
+        var end = moment( $("#wizardEnd").val() );
+        var duration = end.diff(start);
+        console.log("duration", duration);
+        var amount = $("#wizardFlowAmount").val();
+        var seconds = $("#wizardFlowSeconds").val();
+        var flowRate = amount / seconds * ( 10**underlyingDecimals);
+        console.log("flowRate", flowRate);
+        var permanent = $("#wizardPermanent").val();
+        console.log("permanent", permanent);
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': vestorAddress,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': vest.methods.registerFlow(flowAddress, flowRate, permanent, start.unix(), duration).encodeABI()
+        };
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        console.log(txHash);
+        return false;
     });
 
     $(".connect").click(function(){
