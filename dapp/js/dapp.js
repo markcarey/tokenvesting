@@ -130,7 +130,7 @@ async function afterConnection() {
                     console.log("flow", flow);
                     flow = flowToObject(flow);
                     console.log("flow.flowRate", flow.flowRate);
-                    flows.push(flowToArray(flow));
+                    flows.push(flow);
                     if ( !(flow.recipient in flowsByAddress) ) {
                         flowsByAddress[flow.recipient] = [];
                     }
@@ -141,12 +141,40 @@ async function afterConnection() {
                 $('#all-flows').DataTable({
                     data: flows,
                     columns: [
-                        { title: "Address" },
-                        { title: "Flow Rate" },
-                        { title: "Start Date" },
-                        { title: "Duration" },
-                        { title: "Permanent" },
-                        { title: "Status" }
+                        { 
+                            title: "Address",
+                            data: "recipient"
+                        },
+                        { 
+                            title: "Flow Rate", 
+                            data: "flowRate"
+                        },
+                        { 
+                            title: "Start Date",
+                            data: "cliffEnd"
+                        },
+                        { 
+                            title: "Duration",
+                            data: "vestingDuration"
+                        },
+                        { 
+                            title: "Permanent",
+                            data: "permanent"
+                        },
+                        { 
+                            title: "Status",
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var state = full.state;
+                                if ( state == 0 ) {
+                                    return "Registered";
+                                } else if (state == 1) {
+                                    return "Flowing";
+                                } else {
+                                    return "Ended";
+                                }
+                            }
+                        }
                     ]
                 });
             });
