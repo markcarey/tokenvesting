@@ -275,11 +275,10 @@
                                   <label class="col-form-label m-r-10">Unstoppable:</label>
                                   <div class="media-body">
                                     <label class="switch">
-                                      <input id="wizardPermanent" type="checkbox" checked="false" data-bs-original-title="" title=""><span class="switch-state"></span>
+                                        <input id="wizardPermanent" type="checkbox" data-bs-trigger="hover" data-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Unstoppable Flows" data-offset="-20px -20px" data-bs-content="If enabled, you won't be able to stop this flow before the end date"><span class="switch-state"></span>
                                     </label>
                                   </div>
                                 </div>
-                                <small class="form-text text-muted" id="">If enabled, you won't be able to stop this flow prior to the end date</small>
                             </div>
                             <div class="text-center" style="margin-bottom: 20px;">
                               <button class="btn btn-primary" id="addFlow" data-form="wizard" type="button" title="">Add Flow</button>
@@ -530,6 +529,7 @@
     <script src="/assets/js/datepicker/date-picker/datepicker.js"></script>
     <script src="/assets/js/datepicker/date-picker/datepicker.en.js"></script>
     <script src="/assets/js/datepicker/date-picker/datepicker.custom.js"></script>
+    <script src="/assets/js/popover-custom.js"></script>
 
     <!-- Plugins JS Ends-->
     <!-- Theme js-->
@@ -539,6 +539,6 @@
     <script src="https://cdn.ethers.io/lib/ethers-5.1.umd.min.js" type="text/javascript"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="/js/abis.js?v=5"></script>
-    <script src="/js/dapp.js?v=46"></script>
+    <script src="/js/dapp.js?v=47"></script>
   </body>
 </html>
