@@ -138,18 +138,17 @@ async function afterConnection() {
                 });
                 console.log("flowsByAddress", flowsByAddress);
                 console.log("flows", flows);
-            });
-            $('#all-flows').DataTable({
-                data: flows,
-                columns: [
-                    { title: "Address" },
-                    { title: "Flow Rate" },
-                    { title: "Permanent" },
-                    { title: "Status" },
-                    { title: "End Date" },
-                    { title: "Duration" },
-                    { title: "Start Date"}
-                ]
+                $('#all-flows').DataTable({
+                    data: flows,
+                    columns: [
+                        { title: "Address" },
+                        { title: "Flow Rate" },
+                        { title: "Start Date" },
+                        { title: "Duration" },
+                        { title: "Permanent" },
+                        { title: "Status" }
+                    ]
+                });
             });
         } else {
             showWizard = true;
