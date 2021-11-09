@@ -121,10 +121,12 @@ async function afterConnection() {
         if ( vestors.length > 0 ) {
             vestorAddress = vestors[vestors.length - 1];
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
-            underlyingAddress = await vestor.methods.acceptedToken().call();
-            const token = new web3.eth.Contract(tokenABI, underlyingAddress);
-            symbol = await token.methods.symbol().call();
-            underlyingDecimals = await token.methods.decimals().call();
+            superAddress = await vestor.methods.acceptedToken().call();
+            const sToken = new web3.eth.Contract(superABI, superAddress);
+            underlyingAddress = sToken.methods.getUnderlyingToken().call();
+            const uToken = new web3.eth.Contract(tokenABI, underlyingAddress);
+            symbol = await uToken.methods.symbol().call();
+            underlyingDecimals = await uToken.methods.decimals().call();
             if ( symbol ) {
                 underlyingSymbol = symbol;
             }
