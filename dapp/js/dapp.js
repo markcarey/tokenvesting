@@ -129,7 +129,7 @@ async function afterConnection() {
                 flows.push(flow);
             });
         });
-        console.log("flowsByAddress", JSON.stringify(flowsByAddress);
+        console.log("flowsByAddress", JSON.stringify(flowsByAddress));
         console.log("flows", JSON.stringify(flows));
     }
     return new Promise(function(resolve, reject) {
