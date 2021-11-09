@@ -149,7 +149,6 @@ async function afterConnection() {
                 console.log("flowsByAddress", flowsByAddress);
                 console.log("flows", flows);
                 $('#all-flows').DataTable({
-                    buttons: [ 'Add Flow' ],
                     data: flows,
                     columns: [
                         { 
