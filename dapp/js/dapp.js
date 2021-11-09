@@ -121,6 +121,13 @@ async function afterConnection() {
         if ( vestors.length > 0 ) {
             vestorAddress = vestors[vestors.length - 1];
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
+            underlyingAddress = await vestor.methods.acceptedToken().call();
+            const token = new web3.eth.Contract(tokenABI, underlyingAddress);
+            symbol = await token.methods.symbol().call();
+            underlyingDecimals = await token.methods.decimals().call();
+            if ( symbol ) {
+                underlyingSymbol = symbol;
+            }
             recipientAdresses = await vestor.methods.getAllAddresses().call();
             console.log("allAdresses", JSON.stringify(recipientAdresses));
             $.each(recipientAdresses, async function( i, address ) {
@@ -129,6 +136,7 @@ async function afterConnection() {
                 $.each(flowsForAddress, function(j, flow) {
                     console.log("flow", flow);
                     flow = flowToObject(flow);
+                    flow.flowIndex = j;
                     console.log("flow.flowRate", flow.flowRate);
                     flows.push(flow);
                     if ( !(flow.recipient in flowsByAddress) ) {
@@ -211,14 +219,14 @@ async function afterConnection() {
                                 var state = full.state;
                                 if ( state == 0 ) {
                                     if ( parseInt(full.cliffEnd) < (Date.now()/1000) ) {
-                                        actions += `<button data-address="${full.recipient}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
+                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
                                     }
                                 } else if ( state == 1 ) {
                                     if (!full.permanent) { 
-                                        actions += `<button data-address="${full.recipient}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
+                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
                                     }
                                     if ( ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000) ) {
-                                        actions += `<button data-address="${full.recipient}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
+                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
                                     }
                                 }
                                 return actions;
