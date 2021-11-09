@@ -116,8 +116,9 @@ async function afterConnection() {
     $("li.profile-nav").find(".media-body span").text( abbrAddress() );
     status("Connected as " + abbrAddress() );
     const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
+    console.log("vestors for user", vestors);
     if ( vestors.length > 0 ) {
-        vestorAddress = vestors[0];
+        vestorAddress = vestors[vestors.length - 1];
         vestor = new web3.eth.Contract(vestorABI, vestorAddress);
         recipientAdresses = await vestor.methods.getAllAddresses().call();
         console.log("allAdresses", JSON.stringify(recipientAdresses));
