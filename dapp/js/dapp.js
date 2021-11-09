@@ -262,6 +262,7 @@ $( document ).ready(function() {
         vestorAddress = events[0].args._contract;
         log("Vestor created at " + vestorAddress);
         vestor = new web3.eth.Contract(vestorABI, vestorAddress);
+        $tab.next().find("p.lead").text("Deposit " + underlyingSymbol + " into vesting contract");
         $tab.hide().next().show();
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
     });
@@ -297,7 +298,7 @@ $( document ).ready(function() {
             });
             //console.log(txHash);
             var pendingTxHash = txHash;
-            status = "Desposited and upgraded";
+            status(amt + " " + underlyingSymbol + " desposited and upgraded to " + underlyingSymbol + "x");
             $amount = 0;
             approved = 0;
             $tab.hide().next().show();
