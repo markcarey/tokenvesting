@@ -113,7 +113,7 @@ function correctChain() {
 }
 
 async function afterConnection() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(async function(resolve, reject) {
         $("li.profile-nav").find(".media-body span").text( abbrAddress() );
         status("Connected as " + abbrAddress() );
         const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
@@ -135,6 +135,18 @@ async function afterConnection() {
             });
             console.log("flowsByAddress", flowsByAddress);
             console.log("flows", flows);
+            $('#all-flows').DataTable({
+                data: flows,
+                columns: [
+                    { title: "Address" },
+                    { title: "Flow Rate" },
+                    { title: "Permanent" },
+                    { title: "Status" },
+                    { title: "End Date" },
+                    { title: "Duration" },
+                    { title: "Start Date"}
+                ]
+            });
         } else {
             showWizard = true;
             $("#wizard").show();
