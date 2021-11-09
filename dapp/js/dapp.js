@@ -347,7 +347,10 @@ $( document ).ready(function() {
         var seconds = $("#wizardFlowSeconds").val();
         var flowRate = parseInt( amount / seconds * ( 10**underlyingDecimals) );
         console.log("flowRate", flowRate);
-        var permanent = $("#wizardPermanent").val();
+        var permanent = false;
+        if ( $("#wizardPermanent:checked").val() ) {
+            permanent = true;
+        }
         console.log("permanent", permanent);
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
         const tx = {

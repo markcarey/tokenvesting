@@ -7,7 +7,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0x47869752497e9f7A5AE6719111a297fC1D5ce457";
-const vestorAddress = "0x20276dAaD77123ae4be0736b6b2351cA5DDf8ED5";
+const vestorAddress = "0x5fCB61e0Dafa4e1e461BE8011ADd780Bd38271B6";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -1729,6 +1729,11 @@ async function addFlow() {
   console.log("Flows are " + JSON.stringify(flows));
 }
 
+async function getFlows(address) {
+  const flows = await vestor.getFlowRecipient(address);
+  console.log("Flows are " + JSON.stringify(flows));
+}
+
 async function launchVesting() {
   await vestor.launchVesting([PUBLIC_KEY], { gasLimit: 5000000 });
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
@@ -1812,6 +1817,7 @@ async function underlying(addr) {
 
  //clone();
  //addFlow();
+ //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
  //mintSomeDAI()
  //launchVesting()
@@ -1819,7 +1825,7 @@ async function underlying(addr) {
  //resolve("SuperToken")
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
 
- mintSomeDAI()
+ getFlows(PUBLIC_KEY)
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
