@@ -126,11 +126,12 @@ async function afterConnection() {
             $.each(recipientAdresses, async function( i, address ) {
                 var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
                 console.log("flowsForAddress", JSON.stringify(flowsForAddress));
-                flowsByAddress[address] = flowsForAddress;
                 $.each(flowsForAddress, function(j, flow) {
                     console.log("flow", flow);
+                    flow = flowToObject(flow);
                     console.log("flow.flowRate", flow.flowRate);
                     flows.push(flow);
+                    flowsByAddress[flow.recipient].push(flow);
                 });
             });
             console.log("flowsByAddress", flowsByAddress);
@@ -153,6 +154,31 @@ async function afterConnection() {
         }
         resolve();    
     });
+}
+
+function flowToObject(f) {
+    var flow = {
+        "cliffEnd": f.cliffEnd,
+        "flowRate": f.flowRate,
+        "permanent": f.permanent,
+        "recipient": f.recipient,
+        "starttime": f.starttime
+        "state": f.state,
+        "vestingDuration": f.vestingDuration
+    };
+    return flow;
+}
+
+function flowToArray(f) {
+    var flow = [
+        f.recipient,
+        f.flowRate,
+        f.cliffEnd,
+        f.vestingDuration,
+        f.permanent,
+        f.state
+    ];
+    return flow;
 }
 
 async function connectWallet() {
