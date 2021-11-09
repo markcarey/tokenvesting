@@ -14,7 +14,7 @@ const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 var vestor;
 
 var recipientAdresses = [];
-var flowsByAddress = [];
+var flowsByAddress = {};
 var flows = [];
 
 var chain = "mumbai";
@@ -127,6 +127,7 @@ async function afterConnection() {
             console.log("flowsForAddress", JSON.stringify(flowsForAddress));
             flowsByAddress[address] = flowsForAddress;
             $.each(flowsForAddress, function(j, flow) {
+                console.log("flow", flow);
                 flows.push(flow);
             });
         });
