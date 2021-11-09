@@ -128,11 +128,12 @@ async function afterConnection() {
             flowsByAddress[address] = flowsForAddress;
             $.each(flowsForAddress, function(j, flow) {
                 console.log("flow", flow);
+                console.log("flow.flowRate", flow.flowRate);
                 flows.push(flow);
             });
         });
-        console.log("flowsByAddress", JSON.stringify(flowsByAddress));
-        console.log("flows", JSON.stringify(flows));
+        console.log("flowsByAddress", flowsByAddress);
+        console.log("flows", flows);
     }
     return new Promise(function(resolve, reject) {
         resolve();
