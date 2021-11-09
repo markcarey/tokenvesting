@@ -2,7 +2,7 @@
 var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
-var showWizard = true;
+var showWizard = false;
 const factoryAddress = "0x47869752497e9f7A5AE6719111a297fC1D5ce457";
 var vestorAddress = "";
 var underlyingAddress = "";
@@ -113,30 +113,33 @@ function correctChain() {
 }
 
 async function afterConnection() {
-    $("li.profile-nav").find(".media-body span").text( abbrAddress() );
-    status("Connected as " + abbrAddress() );
-    const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
-    console.log("vestors for user", vestors);
-    if ( vestors.length > 0 ) {
-        vestorAddress = vestors[vestors.length - 1];
-        vestor = new web3.eth.Contract(vestorABI, vestorAddress);
-        recipientAdresses = await vestor.methods.getAllAddresses().call();
-        console.log("allAdresses", JSON.stringify(recipientAdresses));
-        $.each(recipientAdresses, async function( i, address ) {
-            var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
-            console.log("flowsForAddress", JSON.stringify(flowsForAddress));
-            flowsByAddress[address] = flowsForAddress;
-            $.each(flowsForAddress, function(j, flow) {
-                console.log("flow", flow);
-                console.log("flow.flowRate", flow.flowRate);
-                flows.push(flow);
-            });
-        });
-        console.log("flowsByAddress", flowsByAddress);
-        console.log("flows", flows);
-    }
     return new Promise(function(resolve, reject) {
-        resolve();
+        $("li.profile-nav").find(".media-body span").text( abbrAddress() );
+        status("Connected as " + abbrAddress() );
+        const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
+        console.log("vestors for user", vestors);
+        if ( vestors.length > 0 ) {
+            vestorAddress = vestors[vestors.length - 1];
+            vestor = new web3.eth.Contract(vestorABI, vestorAddress);
+            recipientAdresses = await vestor.methods.getAllAddresses().call();
+            console.log("allAdresses", JSON.stringify(recipientAdresses));
+            $.each(recipientAdresses, async function( i, address ) {
+                var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
+                console.log("flowsForAddress", JSON.stringify(flowsForAddress));
+                flowsByAddress[address] = flowsForAddress;
+                $.each(flowsForAddress, function(j, flow) {
+                    console.log("flow", flow);
+                    console.log("flow.flowRate", flow.flowRate);
+                    flows.push(flow);
+                });
+            });
+            console.log("flowsByAddress", flowsByAddress);
+            console.log("flows", flows);
+        } else {
+            showWizard = true;
+            $("#wizard").show();
+        }
+        resolve();    
     });
 }
 
