@@ -36,6 +36,10 @@
     <link id="color" rel="stylesheet" href="/assets/css/color-1.css" media="screen">
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="/assets/css/responsive.css">
+
+    <style>
+      .dataTables_length {display: none;}
+    </style>
   </head>
   <body>
     <div class="loader-wrapper">
@@ -102,7 +106,7 @@
               </li>
               <li class="profile-nav onhover-dropdown p-0 me-0">
                 <div class="media profile-media"><img class="b-r-10" src="/assets/images/dashboard/profile.jpg" alt="">
-                  <div class="media-body"><span>Emay Walter</span>
+                  <div class="media-body"><span>Connect</span>
                     <p class="mb-0 font-roboto">Admin <i class="middle fa fa-angle-down"></i></p>
                   </div>
                 </div>
@@ -148,7 +152,13 @@
                   <li class="sidebar-list">
                     <a class="sidebar-link sidebar-title" href="#"><i data-feather="home"></i><span class="">Dashboard</span></a>
                   </li>
-                  <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><i data-feather="book"></i><span class="">Docs</span></a>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title navFlows" href="#"><i data-feather="wind"></i><span class="">Flows</span></a>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title AddFlow" href="#"><i data-feather="plus"></i><span class="">Add Flow</span></a>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title navDeposit" href="#"><i data-feather="dollar-sign"></i><span class="">Add Funds</span></a>
+                  </li>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title navDocs" href="#"><i data-feather="book"></i><span class="">Docs</span></a>
                   </li>
 
                 </ul>
@@ -318,6 +328,67 @@
                   </div>
                 </div>
 
+
+                <div id="addFlow" class="col-md-6 mx-auto" style="">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Add a Vesting Flow</h5><span></span>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="tab tab-flow">
+                            <div class="mb-3">
+                              <p class="lead">Register a vesting flow to an address</p>
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardAddress">Address:</label>
+                              <input class="form-control" id="wizardAddress" type="text" placeholder="0x..." data-bs-original-title="" title="">
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardStart">Start Date:</label>
+                              <div class="input-group">
+                                <input id="wizardStart" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardEnd">End Date:</label>
+                              <div class="input-group">
+                                <input id="wizardEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-auto"><label for="wizardAddress">Amount:</label>
+                                        <input class="form-control" id="wizardFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
+                                    </div> 
+                                    <div class="col-auto">
+                                        <label for="wizardAddress">Per:</label>
+                                        <select class="form-select" id="wizardFlowSeconds" style="display: inline-block;">
+                                          <option value="86400">Day</option>
+                                          <option value="2952000">Month</option>
+                                          <option value="31536000">Year</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                              <div class="media mb-2">
+                                  <label class="col-form-label m-r-10">Unstoppable:</label>
+                                  <div class="media-body">
+                                    <label class="switch">
+                                        <input id="wizardPermanent" type="checkbox" data-bs-trigger="hover" data-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Unstoppable Flows" data-offset="-20px -20px" data-bs-content="If enabled, you won't be able to stop this flow before the end date"><span class="switch-state"></span>
+                                    </label>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="text-center" style="margin-bottom: 20px;">
+                              <button class="btn btn-primary" id="addFlowCard" data-form="" type="button" title="">Add Flow</button>
+                            </div>
+                        </div>
+                        <!-- Container-fluid Ends-->
+                    </div>
+                  </div>
+                </div>
 
               <div class="col-xl-8 xl-100 dashboard-sec box-col-12">
                 <div class="card earning-card">
