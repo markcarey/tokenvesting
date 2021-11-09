@@ -299,8 +299,9 @@ $( document ).ready(function() {
             //console.log(txHash);
             var pendingTxHash = txHash;
             status(amt + " " + underlyingSymbol + " desposited and upgraded to " + underlyingSymbol + "x");
-            $amount = 0;
+            $amount.val(0);
             approved = 0;
+            $button.text("Approve");
             $tab.hide().next().show();
             $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         } else {

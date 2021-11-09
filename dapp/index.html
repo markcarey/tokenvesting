@@ -235,6 +235,52 @@
                               <button class="btn btn-secondary" id="skipDeposit" type="button"  title="">Later</button>
                             </div>
                         </div>
+                        <div class="tab tab-flow">
+                            <div class="mb-3">
+                              <p class="lead">Register a vesting flow to an address</p>
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardAddress">Address:</label>
+                              <input class="form-control" id="wizardAddress" type="text" placeholder="0x..." data-bs-original-title="" title="">
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardStart">Start Date:</label>
+                              <div class="input-group">
+                                <input id="wizardStart" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                              <label for="wizardEnd">End Date:</label>
+                              <div class="input-group">
+                                <input id="wizardEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                              <div class="row">
+                                  <div class="mb-3">
+                                      <input class="form-control" id="wizardFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
+                                  </div>
+                                  <p>per</p>
+                                  <div class="mb-3">
+                                      <select class="form-select" id="wizardFlowSeconds">
+                                        <option value="86400">Day</option>
+                                        <option value="2952000">Month</option>
+                                        <option value="31536000">Year</option>
+                                      </select>
+                                  </div>
+                              </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="wizardPermany">Unstoppable:</label>
+                                <label class="switch">
+                                  <input id="wizardPermanent" type="checkbox" checked="" data-bs-original-title="" title=""><span class="switch-state"></span>
+                                </label>
+                                <small class="form-text text-muted" id="">If enabled, you won't be able to stop this flow prior to the end date</small>
+                            </div>
+                            <div class="text-center" style="margin-bottom: 20px;">
+                              <button class="btn btn-primary deposit" id="addFlow" data-form="wizard" type="button" title="">Add Flow</button>
+                            </div>
+                        </div>
                         <div>
 
                           <!--
@@ -246,7 +292,7 @@
 
                         </div>
                         <!-- Circles which indicates the steps of the form:-->
-                        <div id="setup-wizard" class="text-center"><span class="step active"></span><span class="step"></span><span class="step"></span><span class="step"></span></div>
+                        <div id="setup-wizard" class="text-center"><span class="step active"></span><span class="step"></span><span class="step"></span><span class="step"></span><span class="step"></span></div>
                         <!-- Circles which indicates the steps of the form:-->
                         <!-- Container-fluid Ends-->
                       </form>
@@ -489,6 +535,6 @@
     <script src="https://cdn.ethers.io/lib/ethers-5.1.umd.min.js" type="text/javascript"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="/js/abis.js?v=5"></script>
-    <script src="/js/dapp.js?v=42"></script>
+    <script src="/js/dapp.js?v=44"></script>
   </body>
 </html>

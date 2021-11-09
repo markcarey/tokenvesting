@@ -1767,6 +1767,17 @@ async function mintSomeWETH() {
   await wethx.upgrade('10000000000000000000000');
 }
 
+async function mintSomeDAI() {
+  let contract = new ethers.Contract(
+    addr.dai,
+    WETHabi,
+    signer
+  );
+  await contract.mint('1000000000000000000000000');
+  //await contract.approve(addr.WETHx, '1000000000000000000000000');
+  //await wethx.upgrade('10000000000000000000000');
+}
+
 async function checkBalance() {
   var balance = await wethx.balanceOf(PUBLIC_KEY);
   console.log(balance);
@@ -1802,12 +1813,13 @@ async function underlying(addr) {
  //clone();
  //addFlow();
  //mintSomeWETH()
+ //mintSomeDAI()
  //launchVesting()
  //checkBalance()
  //resolve("SuperToken")
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
 
- underlying("0xAD8d6E74BA51AC6FC2EB19EE78D2375F27F067B8")
+ mintSomeDAI()
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
