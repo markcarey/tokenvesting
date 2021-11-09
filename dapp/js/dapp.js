@@ -202,6 +202,27 @@ async function afterConnection() {
                                     return "Ended";
                                 }
                             }
+                        },
+                        {
+                            title: "Actions",
+                            data: null,
+                            render: function ( data, type, full, meta ) {
+                                var actions = "";
+                                var state = full.state;
+                                if ( state == 0 ) {
+                                    if ( parseInt(full.cliffEnd) < (Date.now()/1000) ) {
+                                        actions += `<button data-address="${full.recipient}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
+                                    }
+                                } else if ( state == 1 ) {
+                                    if (!full.permanent) { 
+                                        actions += `<button data-address="${full.recipient}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
+                                    }
+                                    if ( ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000) ) {
+                                        actions += `<button data-address="${full.recipient}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
+                                    }
+                                }
+                                return actions;
+                            }
                         }
                     ]
                 });
