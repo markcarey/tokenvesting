@@ -152,6 +152,13 @@ $( document ).ready(function() {
         return false;
     });
 
+    $("#underlying").change(function(){
+        if ( $(this).val() == "other" ) {
+            $(this).parent("div").hide();
+            $("#underlying-custom").show();
+        }
+    });
+
     $("#chooseUnderlying").click(async function(){
         var $tab = $(this).parents(".tab");
         var underlying = $("#underlying").val();
