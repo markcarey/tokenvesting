@@ -290,7 +290,7 @@ $( document ).ready(function() {
                 'to': vestorAddress,
                 'gasPrice': gas,
                 'nonce': "" + nonce,
-                'data': vestor.methods.deposit(web3.utils.toHex(web3.utils.toWei(amt))).encodeABI()
+                'data': vestor.methods.deposit(underlyingAddress, web3.utils.toHex(web3.utils.toWei(amt))).encodeABI()
             };
             const txHash = await ethereum.request({
                 method: 'eth_sendTransaction',
