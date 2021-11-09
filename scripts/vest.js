@@ -7,7 +7,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0x47869752497e9f7A5AE6719111a297fC1D5ce457";
-const vestorAddress = "0x5fCB61e0Dafa4e1e461BE8011ADd780Bd38271B6";
+const vestorAddress = "0x23F23daB0Aa8F7aAAA2EaA694509139562024F93";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 

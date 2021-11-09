@@ -2,6 +2,7 @@
 var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
+var showWizard = true;
 const factoryAddress = "0x47869752497e9f7A5AE6719111a297fC1D5ce457";
 var vestorAddress = "";
 var underlyingAddress = "";
@@ -11,6 +12,10 @@ var superAddress = "";
 var approved = 0;
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 var vestor;
+
+var recipientAdresses = [];
+var flowsByAddress = [];
+var flows = [];
 
 var chain = "mumbai";
 var addr = {};
@@ -67,8 +72,9 @@ async function main() {
     accounts = await web3.eth.getAccounts();
     //connectWallet();
     if (accounts.length > 0) {
-        $("li.profile-nav").find(".media-body span").text( abbrAddress() );
+        //$("li.profile-nav").find(".media-body span").text( abbrAddress() );
         //$(".card-buttons button.connect").hide().next().show();
+        return afterConnection();
     }
 
     userChain = await ethereum.request({ method: 'eth_chainId' });
@@ -106,6 +112,31 @@ function correctChain() {
   return correct;
 }
 
+async function afterConnection() {
+    $("li.profile-nav").find(".media-body span").text( abbrAddress() );
+    status("Connected as " + abbrAddress() );
+    const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
+    if ( vestors.length > 0 ) {
+        vestorAddress = vestors[0];
+        vestor = new web3.eth.Contract(vestorABI, vestorAddress);
+        recipientAdresses = await vestor.methods.getAllAddresses().call();
+        console.log("allAdresses", JSON.stringify(recipientAdresses));
+        $.each(recipientAdresses, function( i, address ) {
+            var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
+            console.log("flowsForAddress", JSON.stringify(flowsForAddress));
+            flowsByAddress[address] = flowsForAddress;
+            $.each(flowsForAddress, function(j, flow) {
+                flows.push(flow);
+            });
+        });
+        console.log("flowsByAddress", JSON.stringify(flowsByAddress);
+        console.log("flows", JSON.stringify(flows));
+    }
+    return new Promise(function(resolve, reject) {
+        resolve();
+    });
+}
+
 async function connectWallet() {
     status("Connecting...");
     if (window.ethereum) {
@@ -116,8 +147,7 @@ async function connectWallet() {
                 // Metamask is ready to go!
                 //console.log(result);
                 accounts = result;
-                $("li.profile-nav").find(".media-body span").text( abbrAddress() );
-                status("Connected as " + abbrAddress() );
+                return afterConnection();
             })
             .catch(reason => {
                 // Handle error. Likely the user rejected the login.
