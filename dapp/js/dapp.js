@@ -2,13 +2,15 @@
 var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
-const factoryAddress = "0x0Fd7Bcb003C166cb8d09dA5771B9f5a5E7a41A26";
+const factoryAddress = "0x47869752497e9f7A5AE6719111a297fC1D5ce457";
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
 var underlyingDecimals = 18;
 var superAddress = "";
+var approved = 0;
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
+var vestor;
 
 var chain = "mumbai";
 var addr = {};
@@ -259,8 +261,69 @@ $( document ).ready(function() {
         var events = await ethersSTF.queryFilter(filter, block, 'latest');
         vestorAddress = events[0].args._contract;
         log("Vestor created at " + vestorAddress);
+        vestor = new web3.eth.Contract(vestorABI, vestorAddress);
         $tab.hide().next().show();
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+    });
+
+    $(".deposit").click(async function(){
+        var amt = 0;
+        var wizard = false;
+        var $button = $(this);
+        var $amount;
+        if ( $(this).data("form") == "wizard" ) {
+            wizard = true;
+        }
+        if ( wizard ) {
+            amt = $("#wizardAmount").val();
+            $amount = $("#wizardAmount");
+        } else {
+            amt = $("#amount").val();
+            $amount = $("#amount");
+        }
+        if ( approved >= amt ) {
+            $("button.deposit").text("Waiting...");
+            const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+            const tx = {
+                'from': ethereum.selectedAddress,
+                'to': vestorAddress,
+                'gasPrice': gas,
+                'nonce': "" + nonce,
+                'data': vestor.methods.deposit(web3.utils.toHex(web3.utils.toWei(amt))).encodeABI()
+            };
+            const txHash = await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [tx],
+            });
+            //console.log(txHash);
+            var pendingTxHash = txHash;
+            status = "Desposited and upgraded";
+            $amount = 0;
+            approved = 0;
+            $tab.hide().next().show();
+            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        } else {
+            // need approval
+            $("button.deposit").text("Approving...");
+            const token = new web3.eth.Contract(tokenABI, underlyingAddress);
+            const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+            const tx = {
+                'from': ethereum.selectedAddress,
+                'to': underlyingAddress,
+                'gasPrice': gas,
+                'nonce': "" + nonce,
+                'data': token.methods.approve(vestorAddress, web3.utils.toHex(web3.utils.toWei(amt))).encodeABI()
+            };
+            const txHash = await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [tx],
+            });
+            //console.log(txHash);
+            var pendingTxHash = txHash;
+            $button.text("Deposit");
+            approved = amt;
+            status("Approved");
+        }
     });
 
     $(".connect").click(function(){

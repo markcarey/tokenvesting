@@ -306,6 +306,20 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         if(!transferSuccess) revert("Token transfer failed");
     }
 
+    function deposit(IERC20 token, uint256 amount) public {
+        bool transferSuccess = token.transferFrom(msg.sender, address(this), amount);
+        if(!transferSuccess) revert("Token transfer failed");
+        upgrade(token);
+    }
+
+    function upgrade(IERC20 token) public {
+        uint256 amount = token.balanceOf(address(this));
+        if (amount > 0) {
+            token.approve(address(acceptedToken), amount);
+            acceptedToken.upgrade(amount);
+        }
+    }
+
 }
 
 
