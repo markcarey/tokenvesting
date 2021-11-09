@@ -121,7 +121,7 @@ async function afterConnection() {
         vestor = new web3.eth.Contract(vestorABI, vestorAddress);
         recipientAdresses = await vestor.methods.getAllAddresses().call();
         console.log("allAdresses", JSON.stringify(recipientAdresses));
-        $.each(recipientAdresses, function( i, address ) {
+        $.each(recipientAdresses, async function( i, address ) {
             var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
             console.log("flowsForAddress", JSON.stringify(flowsForAddress));
             flowsByAddress[address] = flowsForAddress;
