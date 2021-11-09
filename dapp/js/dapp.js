@@ -130,12 +130,15 @@ async function afterConnection() {
                     console.log("flow", flow);
                     flow = flowToObject(flow);
                     console.log("flow.flowRate", flow.flowRate);
-                    flows.push(flow);
+                    flows.push(flowToArray(flow));
+                    if ( !(flow.recipient in flowsByAddress) ) {
+                        flowsByAddress[flow.recipient] = [];
+                    }
                     flowsByAddress[flow.recipient].push(flow);
                 });
+                console.log("flowsByAddress", flowsByAddress);
+                console.log("flows", flows);
             });
-            console.log("flowsByAddress", flowsByAddress);
-            console.log("flows", flows);
             $('#all-flows').DataTable({
                 data: flows,
                 columns: [
