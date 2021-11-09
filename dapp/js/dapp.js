@@ -162,7 +162,7 @@ function flowToObject(f) {
         "flowRate": f.flowRate,
         "permanent": f.permanent,
         "recipient": f.recipient,
-        "starttime": f.starttime
+        "starttime": f.starttime,
         "state": f.state,
         "vestingDuration": f.vestingDuration
     };
