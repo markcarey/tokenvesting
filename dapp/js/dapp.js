@@ -183,9 +183,9 @@ async function afterConnection() {
                             render: function ( data, type, full, meta ) {
                                 var perm = full.permanent;
                                 if ( perm ) {
-                                    return "<i data-feather="check-cirlce"></i>";
+                                    return `<i data-feather="check-cirlce"></i>`;
                                 } else {
-                                    return "<i data-feather="x-circle"></i>";
+                                    return `<i data-feather="x-circle"></i>`;
                                 }
                             }
                         },
