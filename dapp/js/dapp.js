@@ -585,14 +585,15 @@ $( document ).ready(function() {
 
     $( "#all-flows" ).on( "click", ".stopFlow", async function() {
         const recipient = $(this).data("address");
-        const flowIndex = $(this).data("flowIndex");
+        const flowIndex = $(this).data("flowindex");
+        console.log("flowIndex", flowIndex);
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
         const tx = {
             'from': ethereum.selectedAddress,
             'to': vestorAddress,
             'gasPrice': gas,
             'nonce': "" + nonce,
-            'data': vestor.methods.closeStream(recipient, "" + flowIndex).encodeABI()
+            'data': vestor.methods.closeStream(recipient, flowIndex).encodeABI()
         };
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
