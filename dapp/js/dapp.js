@@ -579,7 +579,7 @@ $( document ).ready(function() {
         console.log(txHash);
         status("Vesting flow(s) launched for " + recipient);
         afterConnection();
-    }
+    });
 
     $(".navFlows").click(function(){
         $(".section").hide();
