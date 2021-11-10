@@ -576,7 +576,7 @@ $( document ).ready(function() {
     $(".addFlow").click(function(){
         $(".section").hide();
         $(".chart_data_right.second").attr("style", "display: none !important");
-        $("#addFlowCard").show();
+        $("#addFlowSection").show();
         return false;
     });
 
