@@ -311,11 +311,11 @@ async function updateStats() {
 
 }
 
-
+main();
 
 $( document ).ready(function() {
 
-    main();
+    
 
     $("#connect").click(function(){
         //wizard
