@@ -6,7 +6,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFactory.json");
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
-const factoryAddress = "0x4b9399fd6943541a7Af3a035dCe335536B168B7d";
+const factoryAddress = "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7";
 const vestorAddress = "0x373fF49e853269982ACEB4b9A74c84769C19aAEE";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
@@ -2228,7 +2228,7 @@ async function setTimestamp(seconds) {
  //flowTokenBalance()
  //vestorFlow(sToken)
 
- vestorFlow()
+ mintSomeDAI()
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
