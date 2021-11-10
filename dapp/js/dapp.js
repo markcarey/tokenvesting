@@ -232,7 +232,7 @@ async function renderTable(flows) {
                 render: function ( data, type, full, meta ) {
                     var perm = full.permanent;
                     if ( perm ) {
-                        return `<i data-feather="check-cirlce"></i>`;
+                        return `<i data-feather="check-circle"></i>`;
                     } else {
                         return `<i data-feather="x-circle"></i>`;
                     }
@@ -560,6 +560,26 @@ $( document ).ready(function() {
         afterConnection();
         return false;
     });
+
+    $(".launchFlow").click(async function(){
+        const recipient = $(this).data("address");
+        const flowIndex = $(this).data("flowIndex");
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': vestorAddress,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': vestor.methods.launchVesting([recipient]).encodeABI()
+        };
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        console.log(txHash);
+        status("Vesting flow(s) launched for " + recipient);
+        afterConnection();
+    }
 
     $(".navFlows").click(function(){
         $(".section").hide();
