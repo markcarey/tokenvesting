@@ -24,6 +24,7 @@ if (chain == "mumbai") {
     addr.Resolver = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
     addr.SuperTokenFactory = "0x200657E2f123761662567A1744f9ACAe50dF47E6";
     addr.SuperHost = "0xEB796bdb90fFA0f28255275e16936D25d3418603";
+    addr.cfa = "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873";
     addr.WETH = "0x3C68CE8504087f89c640D02d133646d98e64ddd9";
     addr.DAI = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
@@ -35,6 +36,7 @@ if (chain == "polygon") {
     addr.Resolver = "0xE0cc76334405EE8b39213E620587d815967af39C";
     addr.SuperTokenFactory = "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34";
     addr.SuperHost = "0x3E14dC1b13c488a8d5D310918780c983bD5982E7";
+    addr.cfa = ""; // TODO: fill this in
     addr.WETH = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
     addr.DAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
     addr.USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
@@ -48,6 +50,7 @@ if (chain == "polygon") {
 
 const WETH = new web3.eth.Contract(tokenABI, addr.WETH); // need this?
 const resolver = new web3.eth.Contract(resolverABI, addr.Resolver);
+const cfa = new web3.eth.Contract(cfaABI, addr.cfa);
 
 var gas = web3.utils.toHex(new BN('2000000000')); // 2 Gwei;
 var dappChain = 80001; // default to Mumbai
@@ -56,6 +59,7 @@ var accounts;
 var approved = 0;
 var wethBal = 0;
 var vestorBal = 0;
+var dailyFlow = 0;
 
 function abbrAddress(address){
     if (!address) {
@@ -125,10 +129,13 @@ async function afterConnection() {
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
             superAddress = await vestor.methods.acceptedToken().call();
             const sToken = new web3.eth.Contract(superABI, superAddress);
+            vestorBal = await sToken.methods.balanceOf(vestorAddress).call();
             underlyingAddress = await sToken.methods.getUnderlyingToken().call();
             const uToken = new web3.eth.Contract(tokenABI, underlyingAddress);
             symbol = await uToken.methods.symbol().call();
             underlyingDecimals = await uToken.methods.decimals().call();
+            dailyFlow = await cfa.methods.getNetFlow(sToken, vestorAddress).call();
+            dailyFlow = (parseInt(dailyFlow) * -1 ) / (10**underlyingDecimals) * (60*60*24);
             if ( symbol ) {
                 underlyingSymbol = symbol;
             }
@@ -151,6 +158,7 @@ async function afterConnection() {
                 console.log("flowsByAddress", flowsByAddress);
                 console.log("flows", flows);
                 renderTable(flows);
+                flowsByDate(flows);
             });
         } else {
             $(".section").hide();
@@ -719,4 +727,140 @@ function status(message) {
           exit:'animated bounce'
       }
     });
+}
+
+function perDay(flowRate) {
+    return parseInt(flowRate) / (10**underlyingDecimals) * (60*60*24);
+}
+
+function flowsByDate(flows) {
+    const days = 90;
+    var bal = vestorBal;
+    var perDay = dailyFlow;
+    var start = moment().startOf('day');
+    var balances = [bal];
+    var flowRates = [perDay];
+    for (let day = 1; day <= days.length; day++) {
+        var dayStart = start.unix();
+        var end = moment(start).endOf('day');
+        var dayEnd = end.unix();
+        $.each(flows, function( i, flow ) {
+            //check for new flows on this day
+            var flowStart = parseInt(flow.cliffEnd);
+            var flowEnd = flowStart + parseInt(flow.vestingDuration);
+            if ( (flowStart > dayStart) && (flowStart < dayEnd) ) {
+                // starting on this day
+                perDay += perDay(flow.flowRate);
+            }
+            //check for ending flows
+            if ( (flowEnd > dayStart) && (flowEnd < dayEnd) ) {
+                // starting on this day
+                perDay -= perDay(flow.flowRate);
+            }
+        });
+        bal -= perDay;
+        balances.push(bal);
+        flowRates.push(perDay);
+        start = start.add(1, 'days');
+    }
+    console.log(balances);
+    console.log(flowRates);
+    return "TODO";
+}
+
+function renderChat() {
+    var options = {
+        series: [{
+            name: 'series1',
+            data: [6, 20, 15, 40, 18, 20, 18, 23, 18, 35, 30, 55, 0]
+        }, {
+            name: 'series2',
+            data: [2, 22, 35, 32, 40, 25, 50, 38, 42, 28, 20, 45, 0]
+        }],
+        chart: {
+            height: 240,
+            type: 'area',
+            toolbar: {
+                show: false
+            },
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        xaxis: {
+            type: 'category',
+            low: 0,
+            offsetX: 0,
+            offsetY: 0,
+            show: false,
+            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"],
+            labels: {
+                low: 0,
+                offsetX: 0,
+                show: false,
+            },
+            axisBorder: {
+                low: 0,
+                offsetX: 0,
+                show: false,
+            },
+        },
+        markers: {
+            strokeWidth: 3,
+            colors: "#ffffff",
+            strokeColors: [ CubaAdminConfig.primary , CubaAdminConfig.secondary ],
+            hover: {
+                size: 6,
+            }
+        },
+        yaxis: {
+            low: 0,
+            offsetX: 0,
+            offsetY: 0,
+            show: false,
+            labels: {
+                low: 0,
+                offsetX: 0,
+                show: false,
+            },
+            axisBorder: {
+                low: 0,
+                offsetX: 0,
+                show: false,
+            },
+        },
+        grid: {
+            show: false,
+            padding: {
+                left: 0,
+                right: 0,
+                bottom: -15,
+                top: -40
+            }
+        },
+        colors: [ CubaAdminConfig.primary , CubaAdminConfig.secondary ],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.5,
+                stops: [0, 80, 100]
+            }
+        },
+        legend: {
+            show: false,
+        },
+        tooltip: {
+            x: {
+                format: 'MM'
+            },
+        },
+    };
+    
+    var chart = new ApexCharts(document.querySelector("#TBD"), options);
+    chart.render();
 }
