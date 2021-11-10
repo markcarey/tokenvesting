@@ -153,6 +153,8 @@ async function afterConnection() {
                 renderTable(flows);
             });
         } else {
+            $(".section").hide();
+            $(".chart_data_right.second").attr("style", "display: none !important");
             showWizard = true;
             $("#wizard").show();
         }
@@ -363,7 +365,7 @@ $( document ).ready(function() {
             }
         }
         if ( wrapIt ) {
-            log("need transaction to create wrapper for " + symbol);
+            log("need transaction to create wrapper for " + underlyingSymbol);
             $("#wrap").text("Create Super Token for " + underlyingSymbol);
             $tab.hide().next().show();
         } else {
@@ -551,7 +553,7 @@ $( document ).ready(function() {
         console.log(txHash);
         status("Vesting flow added for " + flowAddress);
         if (wizard) {
-            $("wizard").hide();
+            $("#wizard").hide();
             showWizard = false;
         } else {
             $("#addFlowSection").hide();
@@ -578,6 +580,26 @@ $( document ).ready(function() {
         });
         console.log(txHash);
         status("Vesting flow(s) launched for " + recipient);
+        afterConnection();
+    });
+
+    $( "#all-flows" ).on( "click", ".stopFlow", async function() {
+        const recipient = $(this).data("address");
+        const flowIndex = $(this).data("flowIndex");
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': vestorAddress,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': vestor.methods.closeStream(recipient, flowIndex).encodeABI()
+        };
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        console.log(txHash);
+        status("Vesting flow stopped");
         afterConnection();
     });
 
