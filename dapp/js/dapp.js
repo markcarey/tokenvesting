@@ -3,7 +3,7 @@ var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 var showWizard = false;
-const factoryAddress = "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7";
+const factoryAddress = "0x4b9399fd6943541a7Af3a035dCe335536B168B7d";
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
@@ -554,7 +554,7 @@ $( document ).ready(function() {
             $("wizard").hide();
             showWizard = false;
         } else {
-            $("#addFlow").hide();
+            $("#addFlowSection").hide();
         }
         $("#flowsTable").show();
         afterConnection();

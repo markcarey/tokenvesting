@@ -6,7 +6,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFactory.json");
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
-const factoryAddress = "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7";
+const factoryAddress = "0x4b9399fd6943541a7Af3a035dCe335536B168B7d";
 const vestorAddress = "0x23F23daB0Aa8F7aAAA2EaA694509139562024F93";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
@@ -1813,6 +1813,25 @@ async function underlying(addr) {
   console.log("The address is " + addr);
 }
 
+async function transaction(hash) {
+  var txn = await hre.network.provider.request({
+    method: "eth_getTransactionByHash",
+    params: [hash],
+  });
+  console.log(txn);
+  var block = await hre.network.provider.request({
+    method: "eth_getBlockByNumber",
+    params: [txn.blockNumber, true],
+  });
+  console.log(block);
+}
+
+async function setTimestamp(seconds) {
+  var txn = await hre.network.provider.request({
+    method: "evm_setNextBlockTimestamp",
+    params: [seconds],
+  });
+}
 
 
  //clone();
@@ -1824,8 +1843,11 @@ async function underlying(addr) {
  //checkBalance()
  //resolve("SuperToken")
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
+ //transaction("0x980ceb39834a3c7f9714df42d7b979c26fceea7299f678b85f5cf49f3a660a8c")
+ //getBlock("0x1427066")
+ //setTimestamp(1636521636)
 
- mintSomeDAI()
+ setTimestamp(1636521636)
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);

@@ -275,6 +275,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration) public onlyRole(GRANTOR) returns (Flow memory) {
+        require(flowRate > 0, "flowRate <= 0");
         Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0);
         if (_recipients[adr].length == 0) {
             recipientAddresses.push(adr);
