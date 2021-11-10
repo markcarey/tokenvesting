@@ -592,7 +592,7 @@ $( document ).ready(function() {
             'to': vestorAddress,
             'gasPrice': gas,
             'nonce': "" + nonce,
-            'data': vestor.methods.closeStream(recipient, flowIndex).encodeABI()
+            'data': vestor.methods.closeStream(recipient, "" + flowIndex).encodeABI()
         };
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
