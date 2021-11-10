@@ -565,9 +565,15 @@ $( document ).ready(function() {
         return false;
     });
 
+    $(".navStats").click(function(){
+        $(".section").hide();
+        $(".section.stats").show();
+        return false;
+    });
+
     $(".addFlow").click(function(){
         $(".section").hide();
-        $("#addFlow").show();
+        $("#addFlowCard").show();
         return false;
     });
 
