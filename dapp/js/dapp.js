@@ -451,6 +451,8 @@ $( document ).ready(function() {
         if ( $(this).data("form") == "wizard" ) {
             wizard = true;
             prefix = "wizard";
+        } else {
+            prefix = "section";
         }
         amt = $("#" + prefix + "Amount").val();
         $amount = $("#" + prefix + "Amount");
