@@ -87,18 +87,9 @@
                     <h6 class="f-18 mb-0">Notitications</h6>
                   </li>
                   <li>
-                    <p><i class="fa fa-circle-o me-3 font-primary"> </i>Delivery processing <span class="pull-right">10 min.</span></p>
+                    <p><i class="fa fa-circle-o me-3 font-primary"> </i>X days until funding needed</p>
                   </li>
-                  <li>
-                    <p><i class="fa fa-circle-o me-3 font-success"></i>Order Complete<span class="pull-right">1 hr</span></p>
-                  </li>
-                  <li>
-                    <p><i class="fa fa-circle-o me-3 font-info"></i>Tickets Generated<span class="pull-right">3 hr</span></p>
-                  </li>
-                  <li>
-                    <p><i class="fa fa-circle-o me-3 font-danger"></i>Delivery Complete<span class="pull-right">6 hr</span></p>
-                  </li>
-                  <li><a class="btn btn-primary" href="#">Check all notification</a></li>
+
                 </ul>
               </li>
               <li>
@@ -111,11 +102,8 @@
                   </div>
                 </div>
                 <ul class="profile-dropdown onhover-show-div">
-                  <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
-                  <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-                  <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-                  <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                  <li><a href="#"><i data-feather="log-in"> </i><span>Log in</span></a></li>
+                  <li><a href="#" class="team"><i data-feather="users"></i><span>Team </span></a></li>
+                  <li><a href="#" class="disconnect"><i data-feather="log-out"> </i><span>Disconnect</span></a></li>
                 </ul>
               </li>
             </ul>
@@ -412,6 +400,36 @@
                     </div>
                   </div>
 
+                  <div id="teamCard" class="col-md-6 mx-auto section" style="display: none;">
+                    <div class="card">
+                      <div class="card-header">
+                        <h5>Add Team Member</h5><span></span>
+                      </div>
+                      <div class="card-body">
+
+                        <div class="tab tab-deposit">
+                            <div class="mb-3">
+                              <p class="lead">Add team member to manage vesting flows</p>
+                              <label for="teamAddress">Address:</label>
+                              <input class="form-control" id="teamAddress" type="text" placeholder="0x..." data-bs-original-title="" title="">
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label" for="teamRole">Role</label>
+                              <select class="form-select" id="underlying">
+                                <option value="MANAGER">Manager</option>
+                                <option value="GRANTOR">Grantor</option>
+                                <option value="CLOSER">Closer</option>
+                              </select>
+                            </div>
+                            <div class="text-center" style="margin-bottom: 20px;">
+                              <button class="btn btn-primary addTeam" id="addTeam" data-form="card" type="button" title="">Add Team Member</button>
+                            </div>
+                        </div>  
+                
+                      </div>
+                    </div>
+                  </div>  
+
               <div id="stats" class="col-xl-8 xl-100 dashboard-sec box-col-12 stats section">
                 <div class="card earning-card">
                   <div class="card-body p-0">
@@ -653,6 +671,6 @@
     <script src="https://cdn.ethers.io/lib/ethers-5.1.umd.min.js" type="text/javascript"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="/js/abis.js?v=5"></script>
-    <script src="/js/dapp.js?v=114"></script>
+    <script src="/js/dapp.js?v=115"></script>
   </body>
 </html>
