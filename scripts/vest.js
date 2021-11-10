@@ -6,7 +6,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFactory.json");
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
-const factoryAddress = "0xb9E0d4b382544b1476f3C2D6b57DB52b56387aA7";
+const factoryAddress = "0xeD8893EaD510F7eBF690B5DCb22b20D6FBE42263";
 const vestorAddress = "0x373fF49e853269982ACEB4b9A74c84769C19aAEE";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";

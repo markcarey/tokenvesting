@@ -21,6 +21,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
+interface IVestingFactory {
+    function addUser(address user) external returns (bool);    
+}
+
 contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     using SafeMath for uint256;
 
@@ -55,6 +59,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     bytes32 public constant CLOSER = keccak256("CLOSER_ROLE");
    
     address admin;
+    IVestingFactory factory;
 
     function initialize(
         address _acceptedToken,
@@ -81,6 +86,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
         acceptedToken = ISuperToken(_acceptedToken);
         admin = owner;
+        factory = IVestingFactory(msg.sender);
 
         //Access Control
         console.log("before any role granting");
@@ -106,6 +112,11 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     modifier registeredRecipient(address adr) {
         require(isRecipientRegistered(adr), "Not Registered Recipient");
         _;
+    }
+
+    function grantRole(bytes32 role, address account) public override onlyRole(DEFAULT_ADMIN_ROLE) {
+        factory.addUser(account);
+        super.grantRole(role, account);
     }
 
     function launchVesting(address[] calldata recipientAddresses) public onlyRole(MANAGER) {
@@ -351,6 +362,12 @@ contract VestingFactory {
         ownerOfVestor[clone] = msg.sender;
         emit VestorCreated(msg.sender, clone, allVestors.length);
         return clone;
+    }
+
+    // should be called only by vestor contract
+    function addUser(address user) external returns (bool) {
+        userToVestors[user].push(msg.sender);
+        return true;
     }
 
     // returns array of all TokenVestor contract addresses
