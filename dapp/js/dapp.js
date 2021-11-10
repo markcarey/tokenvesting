@@ -88,6 +88,7 @@ async function main() {
     }
 
     window.ethereum.on('accountsChanged', function () {
+        log("accounts changed");
         web3.eth.getAccounts(function (error, accts) {
             console.log(accts[0], 'current account after account change');
             accounts = accts;
@@ -96,7 +97,8 @@ async function main() {
     });
 
     window.ethereum.on('chainChanged', function () {
-      location.reload();
+        log("chain changed");
+        location.reload();
     });
 
     //updateStats();
