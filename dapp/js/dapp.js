@@ -28,8 +28,6 @@ if (chain == "mumbai") {
     addr.WETH = "0x3C68CE8504087f89c640D02d133646d98e64ddd9";
     addr.DAI = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
-    addr.ETHx = "0xC64A23013768E0BE8751Fd6a2381624194Edb6A6"; 
-    addr.WETHx = addr.ETHx;
 }
 if (chain == "polygon") {
     //Polygon
