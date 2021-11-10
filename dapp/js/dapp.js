@@ -480,7 +480,7 @@ $( document ).ready(function() {
                 $tab.hide().next().show();
                 $("#setup-wizard span.active").removeClass("active").next().addClass("active");
             } else {
-                $("depositCard").hide();
+                $("#depositCard").hide();
                 $(".stats.section").show();
             }
         } else {
