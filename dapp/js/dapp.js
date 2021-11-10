@@ -353,7 +353,7 @@ $( document ).ready(function() {
                 underlyingSymbol = symbol;
                 var resolved = await resolver.methods.get("supertokens.v1." + symbol + "x").call();
                 console.log(resolved);
-                if ( resolved == "0x0000000000000000000000000000000000000000" ) {
+                if ( resolved == "0x0000000000000000000000000000000000000000" || resolved == "0xc64a23013768e0be8751fd6a2381624194edb6a6" ) {
                     wrapIt = true;
                 } else {
                     superAddress = resolved;
