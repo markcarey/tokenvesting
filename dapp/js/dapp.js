@@ -70,13 +70,7 @@ async function main() {
     console.log("The chainId is " + dappChain);
 
     accounts = await web3.eth.getAccounts();
-    //connectWallet();
-    if (accounts.length > 0) {
-        //$("li.profile-nav").find(".media-body span").text( abbrAddress() );
-        //$(".card-buttons button.connect").hide().next().show();
-        return afterConnection();
-    }
-
+    
     userChain = await ethereum.request({ method: 'eth_chainId' });
     console.log("The chainId of connected account is " + web3.utils.hexToNumber(userChain));
 
@@ -101,7 +95,11 @@ async function main() {
         location.reload();
     });
 
-    //updateStats();
+    if (accounts.length > 0) {
+        //$("li.profile-nav").find(".media-body span").text( abbrAddress() );
+        //$(".card-buttons button.connect").hide().next().show();
+        return afterConnection();
+    }
     
 }
 
@@ -311,11 +309,11 @@ async function updateStats() {
 
 }
 
-main();
+
 
 $( document ).ready(function() {
 
-    
+    main();
 
     $("#connect").click(function(){
         //wizard
