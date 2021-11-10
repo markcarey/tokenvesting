@@ -561,6 +561,7 @@ $( document ).ready(function() {
 
     $(".navFlows").click(function(){
         $(".section").hide();
+        $(".chart_data_right.second").css("display",  "none !important");
         $("#flowsTable").show();
         return false;
     });
@@ -568,17 +569,20 @@ $( document ).ready(function() {
     $(".navStats").click(function(){
         $(".section").hide();
         $(".section.stats").show();
+        $(".chart_data_right.second").css("display",  "block !important");
         return false;
     });
 
     $(".addFlow").click(function(){
         $(".section").hide();
+        $(".chart_data_right.second").css("display",  "none !important");
         $("#addFlowCard").show();
         return false;
     });
 
     $(".navDeposit").click(function(){
         $(".section").hide();
+        $(".chart_data_right.second").css("display",  "none !important");
         $("#depositCard").show();
         return false;
     });
