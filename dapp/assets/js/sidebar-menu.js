@@ -39,44 +39,7 @@ if ($('#pageWrapper').hasClass('compact-wrapper')) {
     });
     jQuery('.submenu-content').hide();
 } else if ($('#pageWrapper').hasClass('horizontal-wrapper')) {
-    $(window).on('load', function(){ 
-        $(document).load($(window).bind("resize", checkPosition));
-        function checkPosition() {
-            if (window.matchMedia('(max-width: 991px)').matches) {
-                $('#pageWrapper').removeClass('horizontal-wrapper').addClass('compact-wrapper');
-            $('.page-body-wrapper').removeClass('horizontal-menu').addClass('sidebar-icon');
-            jQuery('.submenu-title').append('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-            jQuery('.submenu-title').click(function () {
-                jQuery('.submenu-title').removeClass('active');
-                jQuery('.submenu-title').find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-                jQuery('.submenu-content').slideUp('normal');
-                if (jQuery(this).next().is(':hidden') == true) {
-                    jQuery(this).addClass('active');
-                    jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-down"></i></div>');
-                    jQuery(this).next().slideDown('normal');
-                } else {
-                    jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-                }
-            });
-            jQuery('.submenu-content').hide();
-
-            jQuery('.sidebar-title').append('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-            jQuery('.sidebar-title').click(function () {
-                jQuery('.sidebar-title').removeClass('active');
-                jQuery('.sidebar-title').find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-                jQuery('.sidebar-submenu, .menu-content').slideUp('normal');
-                if (jQuery(this).next().is(':hidden') == true) {
-                    jQuery(this).addClass('active');
-                    jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-down"></i></div>');
-                    jQuery(this).next().slideDown('normal');
-                } else {
-                    jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-                }
-            });
-            jQuery('.sidebar-submenu, .menu-content').hide();
-            } 
-        }
-    })
+    // removed by mark
     
 } else if ($('#pageWrapper').hasClass('compact-sidebar')) {
     
