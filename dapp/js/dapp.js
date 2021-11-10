@@ -260,7 +260,7 @@ async function renderTable(flows) {
                     var state = full.state;
                     if ( state == 0 ) {
                         if ( parseInt(full.cliffEnd) < (Date.now()/1000) ) {
-                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
+                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="Ready to start flowing">Launch</button>`;
                         }
                     } else if ( state == 1 ) {
                         if (!full.permanent) { 
@@ -561,7 +561,7 @@ $( document ).ready(function() {
         return false;
     });
 
-    $(".launchFlow").click(async function(){
+    $( "#all-flows" ).on( "click", ".launchFlow", function() {
         const recipient = $(this).data("address");
         const flowIndex = $(this).data("flowIndex");
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
