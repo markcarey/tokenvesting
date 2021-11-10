@@ -148,95 +148,7 @@ async function afterConnection() {
                 });
                 console.log("flowsByAddress", flowsByAddress);
                 console.log("flows", flows);
-                $('#all-flows').DataTable({
-                    data: flows,
-                    columns: [
-                        { 
-                            title: "Address",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var addr = full.recipient;
-                                var short = abbrAddress(addr);
-                                return `<span title="${addr}">${short}</span>`;
-                            }
-                        },
-                        { 
-                            title: "Flow Rate", 
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var flowRate = full.flowRate;
-                                flowRate = parseInt(flowRate) / ( 10**underlyingDecimals);
-                                flowRate = flowRate * 60*60*24;
-                                return flowRate.toFixed(2) + ` ${underlyingSymbol}x per day`;
-                            }
-                        },
-                        { 
-                            title: "Start Date",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var cliff = full.cliffEnd;
-                                return moment.unix(cliff).format("YYYY-MM-DD");
-                            }
-                        },
-                        { 
-                            title: "Duration",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var dur = full.vestingDuration;
-                                dur = parseInt(dur) / (60*60*24);
-                                return dur.toFixed(1) + " days";
-                            }
-                        },
-                        { 
-                            title: "Permanent",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var perm = full.permanent;
-                                if ( perm ) {
-                                    return `<i data-feather="check-cirlce"></i>`;
-                                } else {
-                                    return `<i data-feather="x-circle"></i>`;
-                                }
-                            }
-                        },
-                        { 
-                            title: "Status",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var state = full.state;
-                                if ( state == 0 ) {
-                                    return "Registered";
-                                } else if (state == 1) {
-                                    return "Flowing";
-                                } else {
-                                    return "Ended";
-                                }
-                            }
-                        },
-                        {
-                            title: "Actions",
-                            data: null,
-                            render: function ( data, type, full, meta ) {
-                                var actions = "";
-                                var state = full.state;
-                                if ( state == 0 ) {
-                                    if ( parseInt(full.cliffEnd) < (Date.now()/1000) ) {
-                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
-                                    }
-                                } else if ( state == 1 ) {
-                                    if (!full.permanent) { 
-                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
-                                    }
-                                    if ( ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000) ) {
-                                        actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
-                                    }
-                                }
-                                return actions;
-                            }
-                        }
-                    ]
-                });
-                feather.replace();
+                renderTable(flows);
             });
         } else {
             showWizard = true;
@@ -269,6 +181,99 @@ function flowToArray(f) {
         f.state
     ];
     return flow;
+}
+
+async function renderTable(flows) {
+    $('#all-flows').DataTable({
+        destroy: true,
+        data: flows,
+        columns: [
+            { 
+                title: "Address",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var addr = full.recipient;
+                    var short = abbrAddress(addr);
+                    return `<span title="${addr}">${short}</span>`;
+                }
+            },
+            { 
+                title: "Flow Rate", 
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var flowRate = full.flowRate;
+                    flowRate = parseInt(flowRate) / ( 10**underlyingDecimals);
+                    flowRate = flowRate * 60*60*24;
+                    return flowRate.toFixed(2) + ` ${underlyingSymbol}x per day`;
+                }
+            },
+            { 
+                title: "Start Date",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var cliff = full.cliffEnd;
+                    return moment.unix(cliff).format("YYYY-MM-DD");
+                }
+            },
+            { 
+                title: "Duration",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var dur = full.vestingDuration;
+                    dur = parseInt(dur) / (60*60*24);
+                    return dur.toFixed(1) + " days";
+                }
+            },
+            { 
+                title: "Permanent",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var perm = full.permanent;
+                    if ( perm ) {
+                        return `<i data-feather="check-cirlce"></i>`;
+                    } else {
+                        return `<i data-feather="x-circle"></i>`;
+                    }
+                }
+            },
+            { 
+                title: "Status",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var state = full.state;
+                    if ( state == 0 ) {
+                        return "Registered";
+                    } else if (state == 1) {
+                        return "Flowing";
+                    } else {
+                        return "Ended";
+                    }
+                }
+            },
+            {
+                title: "Actions",
+                data: null,
+                render: function ( data, type, full, meta ) {
+                    var actions = "";
+                    var state = full.state;
+                    if ( state == 0 ) {
+                        if ( parseInt(full.cliffEnd) < (Date.now()/1000) ) {
+                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="btn btn-success btn-xs">Launch</button>`;
+                        }
+                    } else if ( state == 1 ) {
+                        if (!full.permanent) { 
+                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
+                        }
+                        if ( ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000) ) {
+                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
+                        }
+                    }
+                    return actions;
+                }
+            }
+        ]
+    });
+    feather.replace();
 }
 
 async function connectWallet() {
@@ -438,16 +443,13 @@ $( document ).ready(function() {
         var wizard = false;
         var $button = $(this);
         var $amount;
+        var prefix = "";
         if ( $(this).data("form") == "wizard" ) {
             wizard = true;
+            prefix = "wizard";
         }
-        if ( wizard ) {
-            amt = $("#wizardAmount").val();
-            $amount = $("#wizardAmount");
-        } else {
-            amt = $("#amount").val();
-            $amount = $("#amount");
-        }
+        amt = $("#" + prefix + "Amount").val();
+        $amount = $("#" + prefix + "Amount");
         if ( approved >= amt ) {
             $("button.deposit").text("Waiting...");
             const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
@@ -468,8 +470,13 @@ $( document ).ready(function() {
             $amount.val(0);
             approved = 0;
             $button.text("Approve");
-            $tab.hide().next().show();
-            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+            if (wizard) {
+                $tab.hide().next().show();
+                $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+            } else {
+                $("depositCard").hide();
+                $(".stats.section").show();
+            }
         } else {
             // need approval
             $("button.deposit").text("Approving...");
@@ -495,24 +502,35 @@ $( document ).ready(function() {
         return false;
     });
 
-    $("#addFlow").click(async function(){
+    $("#skipDeposit").click(function(){
+        var $tab = $(this).parents(".tab");
+        $tab.hide().next().show();
+        $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        return false;
+    });
+
+    $("#addFlow, #addFlowCard").click(async function(){
         var $tab = $(this).parents(".tab");
         var wizard = false;
         var $button = $(this);
+        var prefix = "";
         if ( $(this).data("form") == "wizard" ) {
             wizard = true;
+            prefix = "wizard";
+        } else {
+            prefix = "section";
         }
-        var flowAddress = $("#wizardAddress").val();
-        var start = moment( $("#wizardStart").val() );
-        var end = moment( $("#wizardEnd").val() );
+        var flowAddress = $("#" + prefix + "Address").val();
+        var start = moment( $("#" + prefix + "Start").val() );
+        var end = moment( $("#" + prefix + "End").val() );
         var duration = end.unix() - start.unix();;
         console.log("duration", duration);
-        var amount = $("#wizardFlowAmount").val();
-        var seconds = $("#wizardFlowSeconds").val();
+        var amount = $("#" + prefix + "FlowAmount").val();
+        var seconds = $("#" + prefix + "FlowSeconds").val();
         var flowRate = parseInt( amount / seconds * ( 10**underlyingDecimals) );
         console.log("flowRate", flowRate);
         var permanent = false;
-        if ( $("#wizardPermanent:checked").val() ) {
+        if ( $("#" + prefix + "Permanent:checked").val() ) {
             permanent = true;
         }
         console.log("permanent", permanent);
@@ -529,6 +547,33 @@ $( document ).ready(function() {
             params: [tx],
         });
         console.log(txHash);
+        status("Vesting flow added for " + flowAddress);
+        if (wizard) {
+            $("wizard").hide();
+            showWizard = false;
+        } else {
+            $("#addFlow").hide();
+        }
+        $("#flowsTable").show();
+        afterConnection();
+        return false;
+    });
+
+    $(".navFlows").click(function(){
+        $(".section").hide();
+        $("#flowsTable").show();
+        return false;
+    });
+
+    $(".addFlow").click(function(){
+        $(".section").hide();
+        $("#addFlow").show();
+        return false;
+    });
+
+    $(".navDeposit").click(function(){
+        $(".section").hide();
+        $("#depositCard").show();
         return false;
     });
 

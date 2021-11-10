@@ -188,7 +188,7 @@
           <div class="container-fluid">
             <div class="row second-chart-list third-news-update">
 
-              <div id="wizard" class="col-md-6 mx-auto" style="display:none;">
+              <div id="wizard" class="col-md-6 mx-auto section" style="display:none;">
                   <div class="card">
                     <div class="card-header">
                       <h5>Setup Token Vesting</h5><span></span>
@@ -314,7 +314,7 @@
                 </div>
 
 
-              <div class="col-xl-8 xl-100 box-col-12">
+              <div id="flowsTable" class="col-xl-8 xl-100 box-col-12 section">
                   <div class="card">
                     <div class="card-header">
                       <h5 class="mb-3">Vesting Flows</h5>
@@ -329,7 +329,7 @@
                 </div>
 
 
-                <div id="addFlow" class="col-md-6 mx-auto" style="">
+                <div id="addFlow" class="col-md-6 mx-auto section" style="">
                   <div class="card">
                     <div class="card-header">
                       <h5>Add a Vesting Flow</h5><span></span>
@@ -341,29 +341,29 @@
                               <p class="lead">Register a vesting flow to an address</p>
                             </div>
                             <div class="mb-3">
-                              <label for="wizardAddress">Address:</label>
-                              <input class="form-control" id="wizardAddress" type="text" placeholder="0x..." data-bs-original-title="" title="">
+                              <label for="sectionAddress">Address:</label>
+                              <input class="form-control" id="sectionAddress" type="text" placeholder="0x..." data-bs-original-title="" title="">
                             </div>
                             <div class="mb-3">
-                              <label for="wizardStart">Start Date:</label>
+                              <label for="sectionStart">Start Date:</label>
                               <div class="input-group">
-                                <input id="wizardStart" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                                <input id="sectionStart" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
                               </div>
                             </div>
                             <div class="mb-3">
-                              <label for="wizardEnd">End Date:</label>
+                              <label for="sectionEnd">End Date:</label>
                               <div class="input-group">
-                                <input id="wizardEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
+                                <input id="sectionEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
                               </div>
                             </div>
                             <div class="mb-3">
                                 <div class="row">
-                                    <div class="col-auto"><label for="wizardAddress">Amount:</label>
-                                        <input class="form-control" id="wizardFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
+                                    <div class="col-auto"><label for="sectionFlowAmount">Amount:</label>
+                                        <input class="form-control" id="sectionFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
                                     </div> 
                                     <div class="col-auto">
-                                        <label for="wizardAddress">Per:</label>
-                                        <select class="form-select" id="wizardFlowSeconds" style="display: inline-block;">
+                                        <label for="sectionFlowSeconds">Per:</label>
+                                        <select class="form-select" id="sectionFlowSeconds" style="display: inline-block;">
                                           <option value="86400">Day</option>
                                           <option value="2952000">Month</option>
                                           <option value="31536000">Year</option>
@@ -376,7 +376,7 @@
                                   <label class="col-form-label m-r-10">Unstoppable:</label>
                                   <div class="media-body">
                                     <label class="switch">
-                                        <input id="wizardPermanent" type="checkbox" data-bs-trigger="hover" data-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Unstoppable Flows" data-offset="-20px -20px" data-bs-content="If enabled, you won't be able to stop this flow before the end date"><span class="switch-state"></span>
+                                        <input id="sectionPermanent" type="checkbox" data-bs-trigger="hover" data-container="body" data-bs-toggle="popover" data-bs-placement="bottom" title="Unstoppable Flows" data-offset="-20px -20px" data-bs-content="If enabled, you won't be able to stop this flow before the end date"><span class="switch-state"></span>
                                     </label>
                                   </div>
                                 </div>
@@ -390,7 +390,7 @@
                   </div>
                 </div>
 
-                <div id="depositCard" class="col-md-6 mx-auto" style="">
+                <div id="depositCard" class="col-md-6 mx-auto section" style="">
                     <div class="card">
                       <div class="card-header">
                         <h5>Deposit Funds</h5><span></span>
@@ -412,7 +412,7 @@
                     </div>
                   </div>
 
-              <div class="col-xl-8 xl-100 dashboard-sec box-col-12">
+              <div id="stats" class="col-xl-8 xl-100 dashboard-sec box-col-12 stats section">
                 <div class="card earning-card">
                   <div class="card-body p-0">
                     <div class="row m-0">
@@ -503,7 +503,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-xl-9 xl-100 chart_data_left box-col-12">
+
+              <div id="stats2" class="col-xl-9 xl-100 chart_data_left box-col-12 stats section">
                 <div class="card">
                   <div class="card-body p-0">
                     <div class="row m-0 chart-main">
@@ -567,7 +568,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-xl-3 xl-50 chart_data_right box-col-12">
+
+              <div id="stats3" class="col-xl-3 xl-50 chart_data_right box-col-12 stats section">
                 <div class="card">
                   <div class="card-body">
                     <div class="media align-items-center">
@@ -581,7 +583,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-xl-3 xl-50 chart_data_right second d-none"> 
+
+              <div id="stats4" class="col-xl-3 xl-50 chart_data_right second d-none stats section"> 
                 <div class="card">
                   <div class="card-body">
                     <div class="media align-items-center">
@@ -595,6 +598,8 @@
                   </div>
                 </div>
               </div>
+
+
             </div>
           </div>
           <!-- Container-fluid Ends-->
@@ -648,6 +653,6 @@
     <script src="https://cdn.ethers.io/lib/ethers-5.1.umd.min.js" type="text/javascript"></script>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="/js/abis.js?v=5"></script>
-    <script src="/js/dapp.js?v=80"></script>
+    <script src="/js/dapp.js?v=81"></script>
   </body>
 </html>
