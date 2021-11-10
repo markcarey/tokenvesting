@@ -114,6 +114,8 @@ function correctChain() {
 
 async function afterConnection() {
     return new Promise(async function(resolve, reject) {
+        flowsByAddress = {};
+        flows = []
         $("li.profile-nav").find(".media-body span").text( abbrAddress() );
         status("Connected as " + abbrAddress() );
         const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
