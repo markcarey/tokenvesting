@@ -561,7 +561,7 @@ $( document ).ready(function() {
         return false;
     });
 
-    $( "#all-flows" ).on( "click", ".launchFlow", function() {
+    $( "#all-flows" ).on( "click", ".launchFlow", async function() {
         const recipient = $(this).data("address");
         const flowIndex = $(this).data("flowIndex");
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
