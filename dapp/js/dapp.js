@@ -460,7 +460,7 @@ $( document ).ready(function() {
         //console.log(txHash);
         var pendingTxHash = txHash;
 
-        var provider = new ethers.providers.JsonRpcProvider({"url": "wss://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"});
+        var provider = new ethers.providers.JsonRpcProvider({"url": "https://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"});
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
         var events = await ethersSTF.queryFilter(filter, block, 'latest');
