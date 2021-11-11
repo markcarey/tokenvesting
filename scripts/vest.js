@@ -6,8 +6,8 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFactory.json");
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
-const factoryAddress = "0xeD8893EaD510F7eBF690B5DCb22b20D6FBE42263";
-const vestorAddress = "0x373fF49e853269982ACEB4b9A74c84769C19aAEE";
+const factoryAddress = "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
+const vestorAddress = "0x62fea6b82e48EB118f1f0b453DC269e6ea05Ab1C";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2249,7 +2249,7 @@ async function setTimestamp(seconds) {
  //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
 
- estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
+ grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);

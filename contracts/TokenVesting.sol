@@ -99,8 +99,27 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         _setupRole(CLOSER, admin);
     }
 
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "Only allowed by admin");
+    modifier onlyManager() {
+        require(hasRole(MANAGER,msg.sender) || 
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender), 
+                "Only allowed by Manager");
+        _;
+    }
+    
+    modifier atLeastGrantor() {
+        require(hasRole(MANAGER,msg.sender) || 
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
+                hasRole(GRANTOR, msg.sender),
+                "Only allowed by Grantor or Manager");
+        _;
+    }
+    
+    modifier atLeastCloser() {
+        require(hasRole(MANAGER,msg.sender) || 
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
+                hasRole(GRANTOR, msg.sender) ||
+                hasRole(CLOSER, msg.sender),
+                "Only allowed by Closer or Grantor or Manager");
         _;
     }
 
@@ -119,7 +138,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         super.grantRole(role, account);
     }
 
-    function launchVesting(address[] calldata recipientAddresses) public onlyRole(MANAGER) {
+    function launchVesting(address[] calldata recipientAddresses) public onlyManager {
         console.log("start launchVesting");
         for(uint i = 0; i < recipientAddresses.length; i++) {
             address addr = recipientAddresses[i];
@@ -185,7 +204,15 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         flowRates[recipient] = newFlowRate;
     }
 
-    function closeVesting(address[] calldata recipientAddresses) public onlyRole(CLOSER) {
+    function elapsedTime(address recipient, uint256 flowIndex) public view returns (uint256) {
+        uint256 elapsed = 0;
+        if (_recipients[recipient][flowIndex].starttime > 0) {
+            elapsed = block.timestamp.sub(_recipients[recipient][flowIndex].starttime);
+        }
+        return elapsed;
+    }
+
+    function closeVesting(address[] calldata recipientAddresses) public atLeastCloser {
         for(uint i = 0; i < recipientAddresses.length; i++) {
             address addr = recipientAddresses[i];
             Flow[] memory flows = _recipients[addr];
@@ -207,7 +234,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         }
     }
 
-    function closeStream(address recipient, uint256 flowIndex) public onlyRole(CLOSER) {
+    function closeStream(address recipient, uint256 flowIndex) public atLeastCloser {
         require(_recipients[recipient][flowIndex].state == FlowState.Flowing, "Stream inactive");
 
         if(elapsedTime(recipient, flowIndex) < _recipients[recipient][flowIndex].vestingDuration) {
@@ -239,15 +266,15 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     // now this returns an array of {Flow}s
-    function getFlowRecipient(address adr) public onlyRole(MANAGER) view returns (Flow[] memory) {
+    function getFlowRecipient(address adr) public onlyManager view returns (Flow[] memory) {
         return _recipients[adr];
     }
 
-    function getAllAddresses() public onlyRole(MANAGER) view returns (address[] memory) {
+    function getAllAddresses() public onlyManager view returns (address[] memory) {
         return recipientAddresses;
     }
 
-    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration) public onlyRole(GRANTOR) returns (Flow memory) {
+    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration) public atLeastGrantor returns (Flow memory) {
         require(flowRate > 0, "flowRate <= 0");
         Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0);
         if (_recipients[adr].length == 0) {
@@ -274,7 +301,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         return acceptedToken.balanceOf(address(this));
     }
 
-    function withdraw(IERC20 token, uint256 amount) public onlyRole(MANAGER) {
+    function withdraw(IERC20 token, uint256 amount) public onlyManager {
         require(amount <= token.balanceOf(address(this)), "Withdrawal amount exceeds balance");
         bool transferSuccess = token.transfer(msg.sender, amount);
         if(!transferSuccess) revert("Token transfer failed");

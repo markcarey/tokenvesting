@@ -40,6 +40,7 @@
     <style>
       .dataTables_length {display: none;}
       .chart-days li {cursor: pointer;}
+      .section:not(.chart_data_right) {margin-top: 20px;}
     </style>
   </head>
   <body>
@@ -73,7 +74,7 @@
             </div>
           </form>
           <div class="header-logo-wrapper col-auto p-0">
-            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid" src="assets/images/logo/logo.png?v=1" alt=""></a></div>
+            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid" id="logoImg" src="assets/images/logo/logo.png?v=1" alt=""></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
           </div>
           <div class="left-header col horizontal-wrapper ps-0">
@@ -147,7 +148,7 @@
                   </li>
                   <li class="sidebar-list"><a class="sidebar-link sidebar-title navDeposit" href="#"><i data-feather="dollar-sign"></i><span class="">Add Funds</span></a>
                   </li>
-                  <li class="sidebar-list"><a class="sidebar-link sidebar-title navDocs" href="#"><i data-feather="book"></i><span class="">Docs</span></a>
+                  <li class="sidebar-list"><a class="sidebar-link sidebar-title team" href="#"><i data-feather="users"></i><span class="">Team</span></a>
                   </li>
 
                 </ul>
@@ -158,23 +159,9 @@
         </div>
         <!-- Page Sidebar Ends-->
         <div class="page-body">
-          <div class="container-fluid">        
-            <div class="page-title">
-              <div class="row">
-                <div class="col-6">
-                  <h3>Dashboard</h3>
-                </div>
-                <div class="col-6">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">                                       <i data-feather="home"></i></a></li>
-                    <li class="breadcrumb-item">Dashboard</li>
-                  </ol>
-                </div>
-              </div>
-            </div>
-          </div>
+
           <!-- Container-fluid starts-->
-          <div class="container-fluid">
+          <div class="container-fluid" style="margin-top:20px;">
             <div class="row second-chart-list third-news-update">
 
               <div id="wizard" class="col-md-6 mx-auto section" style="display:none;">
@@ -416,7 +403,7 @@
                             </div>
                             <div class="mb-3">
                               <label class="form-label" for="teamRole">Role</label>
-                              <select class="form-select" id="underlying">
+                              <select class="form-select" id="teamRole">
                                 <option value="MANAGER">Manager</option>
                                 <option value="GRANTOR">Grantor</option>
                                 <option value="CLOSER">Closer</option>
@@ -563,15 +550,10 @@
     <!-- Plugins JS start-->
     <script src="assets/js/sidebar-menu.js?v=2"></script>
     <script src="assets/js/datatable/datatables/jquery.dataTables.min.js"></script>
-    <script src="assets/js/chart/chartist/chartist.js"></script>
-    <script src="assets/js/chart/chartist/chartist-plugin-tooltip.js"></script>
     <script src="assets/js/chart/knob/knob.min.js"></script>
-    <script src="assets/js/chart/knob/knob-chart.js"></script>
     <script src="assets/js/chart/apex-chart/apex-chart.js"></script>
     <script src="assets/js/chart/apex-chart/stock-prices.js"></script>
     <script src="assets/js/notify/bootstrap-notify.min.js"></script>
-    
-    <script src="assets/js/notify/index.js"></script>
     <script src="assets/js/datepicker/date-picker/datepicker.js"></script>
     <script src="assets/js/datepicker/date-picker/datepicker.en.js"></script>
     <script src="assets/js/datepicker/date-picker/datepicker.custom.js"></script>

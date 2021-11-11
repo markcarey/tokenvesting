@@ -3,7 +3,7 @@ var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 var showWizard = false;
-const factoryAddress = "0xeD8893EaD510F7eBF690B5DCb22b20D6FBE42263";
+const factoryAddress = "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
@@ -12,6 +12,11 @@ var superAddress = "";
 var approved = 0;
 const factory = new web3.eth.Contract(factoryABI, factoryAddress);
 var vestor;
+var roles = {
+    MANAGER: web3.utils.keccak256("MANAGER_ROLE"),
+    GRANTOR: web3.utils.keccak256("GRANTOR_ROLE"),
+    CLOSER: web3.utils.keccak256("CLOSER_ROLE")
+};
 
 var recipientAdresses = [];
 var flowsByAddress = {};
@@ -87,10 +92,10 @@ async function main() {
     console.log("The chainId of connected account is " + web3.utils.hexToNumber(userChain));
 
     if ( !correctChain() ) {
-        //$("body").append(wrongNetworkModal());
-        //$(".close, .modal-backdrop").click(function(){
-        //    $(".fade.show").remove();
-        //});
+        await ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: web3.utils.toHex(dappChain) }],
+        });
     }
 
     window.ethereum.on('accountsChanged', function () {
@@ -114,7 +119,6 @@ async function main() {
     }
     
 }
-
 
 function correctChain() {
   var correct = false;
@@ -614,7 +618,11 @@ $( document ).ready(function() {
             $("#addFlowSection").hide();
         }
         $("#flowsTable").show();
-        afterConnection();
+        flowsChart.destroy();
+        afterConnection()
+            .then(function(){
+                renderChart(flows, 30);
+            });
         return false;
     });
 
@@ -657,6 +665,31 @@ $( document ).ready(function() {
         console.log(txHash);
         status("Vesting flow stopped");
         afterConnection();
+    });
+
+    $("#addTeam").click(async function(){
+        var teamMember = $("#teamAddress").val();
+        var chosenRole = $("#teamRole").val();
+        const role = roles[chosenRole];
+        status("adding " + teamMember + " as a " + chosenRole + "...");
+        const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
+        const tx = {
+            'from': ethereum.selectedAddress,
+            'to': vestorAddress,
+            'gasPrice': gas,
+            'nonce': "" + nonce,
+            'data': vestor.methods.grantRole(role, teamMember).encodeABI()
+        };
+        const block = web3.eth.getBlockNumber();
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [tx],
+        });
+        //console.log(txHash);
+        var pendingTxHash = txHash;
+        status("Added " + teamMember + " as a " + chosenRole);
+        $("#teamAddress").val("");
+        return false;
     });
 
     $(".chart-days li").click(function(){
@@ -893,9 +926,9 @@ function renderChart(chart, days) {
         },
         yaxis: [
                 {
-                low: 0,
-                offsetX: 0,
-                offsetY: 0,
+                //low: 0,
+                //offsetX: 0,
+                //offsetY: 0,
                 show: false,
                 labels: {
                     low: 0,
@@ -903,16 +936,16 @@ function renderChart(chart, days) {
                     show: false,
                 },
                 axisBorder: {
-                    low: 0,
-                    offsetX: 0,
+                    //low: 0,
+                    //offsetX: 0,
                     show: false,
                 },
             },
             {
                 opposite: true,
-                low: 0,
-                offsetX: 0,
-                offsetY: 0,
+                //low: 0,
+                //offsetX: 0,
+                //offsetY: 0,
                 show: false,
                 labels: {
                     low: 0,
@@ -920,8 +953,8 @@ function renderChart(chart, days) {
                     show: false,
                 },
                 axisBorder: {
-                    low: 0,
-                    offsetX: 0,
+                    //low: 0,
+                    //offsetX: 0,
                     show: false,
                 },
             }
@@ -932,7 +965,7 @@ function renderChart(chart, days) {
                 left: 0,
                 right: 0,
                 bottom: -15,
-                top: -40
+                //top: -40
             }
         },
         colors: [ CubaAdminConfig.primary , CubaAdminConfig.secondary ],

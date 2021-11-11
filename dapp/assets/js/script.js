@@ -123,6 +123,11 @@
     $(".mode").on("click", function () {
         $('.mode i').toggleClass("fa-moon-o").toggleClass("fa-lightbulb-o");
         $('body').toggleClass("dark-only");
+        if ( $('.mode i').hasClass("fa-lightbulb-o") ) {
+            $("#logoImg").attr("src", "assets/images/logo/logo_dark.png");
+        } else {
+            $("#logoImg").attr("src", "assets/images/logo/logo.png");
+        }
         var color = $(this).attr("data-attr");
         localStorage.setItem('body', 'dark-only');
     });
