@@ -749,8 +749,9 @@ function flowsByDate(flows) {
     var bal = parseInt(vestorBal) / (10**underlyingDecimals);
     var perDay = dailyFlow;
     var start = moment().startOf('day');
-    var balances = [bal];
-    var flowRates = [perDay];
+    var balances = [];
+    var flowRates = [];
+    var dates = []
     for (let day = 1; day <= days; day++) {
         var dayStart = start.unix();
         var end = moment(start).endOf('day');
@@ -774,10 +775,12 @@ function flowsByDate(flows) {
         bal -= perDay;
         balances.push(bal);
         flowRates.push(perDay);
+        dates.push(start.format("YYYY-MM-DD"));
         start = start.add(1, 'days');
     }
     console.log(balances);
     console.log(flowRates);
+    console.log(dates);
     return "TODO";
 }
 
