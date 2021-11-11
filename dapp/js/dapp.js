@@ -746,7 +746,7 @@ function perDay(flowRate) {
 
 function flowsByDate(flows) {
     const days = 90;
-    var bal = vestorBal;
+    var bal = parseInt(vestorBal) / (10**underlyingDecimals);
     var perDay = dailyFlow;
     var start = moment().startOf('day');
     var balances = [bal];
@@ -755,17 +755,19 @@ function flowsByDate(flows) {
         var dayStart = start.unix();
         var end = moment(start).endOf('day');
         var dayEnd = end.unix();
+        console.log("dayStart,dayEnd", dayStart,dayEnd);
         $.each(flows, function( i, flow ) {
             //check for new flows on this day
             var flowStart = parseInt(flow.cliffEnd);
             var flowEnd = flowStart + parseInt(flow.vestingDuration);
+            console.log("flowStart,flowEnd", flowStart,flowEnd);
             if ( (flowStart > dayStart) && (flowStart < dayEnd) ) {
-                // starting on this day
+                console.log("starting on this day");
                 perDay += perDay(flow.flowRate);
             }
             //check for ending flows
             if ( (flowEnd > dayStart) && (flowEnd < dayEnd) ) {
-                // starting on this day
+                console.log("ending on this day");
                 perDay -= perDay(flow.flowRate);
             }
         });

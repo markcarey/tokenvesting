@@ -2237,7 +2237,7 @@ async function setTimestamp(seconds) {
  //vestorFlow(sToken)
  //grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
 
- clone()
+ setTimestamp(1636595650)
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
