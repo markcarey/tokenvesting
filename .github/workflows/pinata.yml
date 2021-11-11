@@ -1,0 +1,16 @@
+name: Deploy to Skynet
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.4
+    with:
+      pin-name: 'TokenVesting'
+      path: './dapp'
+      pinata-api-key: ${{ secrets.PINATA_API_KEY }}
+      pinata-secret-api-key: ${{ secrets.PINATA_SECRET_API_KEY }}
+      verbose: true
+      remove-old: true
