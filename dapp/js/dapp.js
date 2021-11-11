@@ -116,6 +116,11 @@ async function main() {
         //$("li.profile-nav").find(".media-body span").text( abbrAddress() );
         //$(".card-buttons button.connect").hide().next().show();
         return afterConnection();
+    } else {
+        $(".section").hide();
+        $(".chart_data_right.second").attr("style", "display: none !important");
+        showWizard = true;
+        $("#wizard").show();
     }
     
 }
