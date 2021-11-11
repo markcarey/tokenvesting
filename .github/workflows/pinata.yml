@@ -6,11 +6,12 @@ on:
 
 jobs:
   build:
-    uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.4
-    with:
-      pin-name: 'TokenVesting'
-      path: './dapp'
-      pinata-api-key: ${{ secrets.PINATA_API_KEY }}
-      pinata-secret-api-key: ${{ secrets.PINATA_SECRET_API_KEY }}
-      verbose: true
-      remove-old: true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload to IPFS
+      uses: aquiladev/ipfs-action@v0.1.6
+      with:
+        path: "./dapp"
+        pinataKey: ${{ secrets.PINATA_API_KEY }}
+        pinataSecret: ${{ secrets.PINATA_SECRET_API_KEY }}
+        pinataPinName: "TokenVesting"
