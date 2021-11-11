@@ -900,6 +900,9 @@ function renderChart(chart) {
             },
         },
     };
+    console.log("ready to render chart");
+    $("#flows-chart").html("");
     flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
     flowsChart.destroy().render();
+    console.log("rendered chart");
 }
