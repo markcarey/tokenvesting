@@ -63,6 +63,7 @@ var approved = 0;
 var wethBal = 0;
 var vestorBal = 0;
 var dailyFlow = 0;
+var daysLeft = 0;
 
 function abbrAddress(address){
     if (!address) {
@@ -148,6 +149,9 @@ async function afterConnection() {
             if ( symbol ) {
                 underlyingSymbol = symbol;
             }
+            const displayBal = parseInt(vestorBal) / (10**underlyingDecimals);
+            $("#vestorBal").text(displayBal.toFixed(2));
+            $("#flowRate").text(dailyFlow);
             recipientAdresses = await vestor.methods.getAllAddresses().call();
             console.log("allAdresses", JSON.stringify(recipientAdresses));
             $.each(recipientAdresses, async function( i, address ) {
@@ -168,6 +172,7 @@ async function afterConnection() {
                 console.log("flows", flows);
                 renderTable(flows);
                 chart = flowsByDate(flows);
+                $("#daysLeft").text(daysLeft);
                 renderChart(chart);
             });
         } else {
@@ -781,11 +786,15 @@ function flowsByDate(flows) {
         bal -= perDay;
         if (bal < 0) {
             bal = 0;
+            daysLeft = day;
         }
         balances.push(bal);
         flowRates.push(perDay);
         dates.push(start.format("YYYY-MM-DD"));
         start = start.add(1, 'days');
+    }
+    if (bal > 0) {
+        daysLeft = "90+";
     }
     console.log(balances);
     console.log(flowRates);
