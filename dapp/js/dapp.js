@@ -21,6 +21,7 @@ var chart = {
     "flowRates": [],
     "dates": []
 };
+var flowsChart;
 
 var chain = "mumbai";
 var addr = {};
@@ -786,7 +787,9 @@ function flowsByDate(flows) {
         bal -= perDay;
         if (bal < 0) {
             bal = 0;
-            daysLeft = day;
+            if (daysLeft = 0) {
+                daysLeft = day;
+            }
         }
         balances.push(bal);
         flowRates.push(perDay);
@@ -897,6 +900,6 @@ function renderChart(chart) {
             },
         },
     };
-    var flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
-    flowsChart.render();
+    flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
+    flowsChart.destroy().render();
 }
