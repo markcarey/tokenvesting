@@ -151,7 +151,7 @@ async function afterConnection() {
             }
             const displayBal = parseInt(vestorBal) / (10**underlyingDecimals);
             $("#vestorBal").text(displayBal.toFixed(2));
-            $("#flowRate").text(dailyFlow);
+            $("#flowRate").text(dailyFlow.toFixed(2));
             recipientAdresses = await vestor.methods.getAllAddresses().call();
             console.log("allAdresses", JSON.stringify(recipientAdresses));
             $.each(recipientAdresses, async function( i, address ) {
@@ -751,7 +751,7 @@ function status(message) {
     });
 }
 
-function perDay(flowRate) {
+function flowPerDay(flowRate) {
     return parseInt(flowRate) / (10**underlyingDecimals) * (60*60*24);
 }
 
@@ -775,12 +775,12 @@ function flowsByDate(flows) {
             console.log("flowStart,flowEnd", flowStart,flowEnd);
             if ( (flowStart >= dayStart) && (flowStart <= dayEnd) ) {
                 console.log("starting on this day");
-                perDay += perDay(flow.flowRate);
+                perDay += flowPerDay(flow.flowRate);
             }
             //check for ending flows
             if ( (flowEnd >= dayStart) && (flowEnd <= dayEnd) ) {
                 console.log("ending on this day");
-                perDay -= perDay(flow.flowRate);
+                perDay -= flowPerDay(flow.flowRate);
             }
         });
         bal -= perDay;
