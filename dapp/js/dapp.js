@@ -16,6 +16,11 @@ var vestor;
 var recipientAdresses = [];
 var flowsByAddress = {};
 var flows = [];
+var chart = {
+    "balances": [],
+    "flowRates": [],
+    "dates": []
+};
 
 var chain = "mumbai";
 var addr = {};
@@ -162,7 +167,8 @@ async function afterConnection() {
                 console.log("flowsByAddress", flowsByAddress);
                 console.log("flows", flows);
                 renderTable(flows);
-                flowsByDate(flows);
+                chart = flowsByDate(flows);
+                renderChart(chart);
             });
         } else {
             $(".section").hide();
@@ -773,6 +779,9 @@ function flowsByDate(flows) {
             }
         });
         bal -= perDay;
+        if (bal < 0) {
+            bal = 0;
+        }
         balances.push(bal);
         flowRates.push(perDay);
         dates.push(start.format("YYYY-MM-DD"));
@@ -781,17 +790,20 @@ function flowsByDate(flows) {
     console.log(balances);
     console.log(flowRates);
     console.log(dates);
-    return "TODO";
+    chart.balances = balances;
+    chart.flowRates = flowRates;
+    chart.dates = dates;
+    return chart;
 }
 
-function renderChat() {
+function renderChart(chart) {
     var options = {
         series: [{
-            name: 'series1',
-            data: [6, 20, 15, 40, 18, 20, 18, 23, 18, 35, 30, 55, 0]
+            name: 'Balance',
+            data: chart.balances
         }, {
-            name: 'series2',
-            data: [2, 22, 35, 32, 40, 25, 50, 38, 42, 28, 20, 45, 0]
+            name: 'flow rate',
+            data: chart.flowRates
         }],
         chart: {
             height: 240,
@@ -812,7 +824,7 @@ function renderChat() {
             offsetX: 0,
             offsetY: 0,
             show: false,
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"],
+            categories: chart.dates,
             labels: {
                 low: 0,
                 offsetX: 0,
@@ -876,7 +888,6 @@ function renderChat() {
             },
         },
     };
-    
-    var chart = new ApexCharts(document.querySelector("#TBD"), options);
-    chart.render();
+    var flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
+    flowsChart.render();
 }
