@@ -768,7 +768,7 @@ function flowsByDate(flows) {
             var flowStart = parseInt(flow.cliffEnd);
             var flowEnd = flowStart + parseInt(flow.vestingDuration);
             console.log("flowStart,flowEnd", flowStart,flowEnd);
-            if ( (flowStart >= dayStart) && (flowStart =< dayEnd) ) {
+            if ( (flowStart >= dayStart) && (flowStart <= dayEnd) ) {
                 console.log("starting on this day");
                 perDay += perDay(flow.flowRate);
             }
