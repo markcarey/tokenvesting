@@ -2249,7 +2249,7 @@ async function setTimestamp(seconds) {
  //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
 
- grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
+ mintSomeWETH()
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
