@@ -787,7 +787,7 @@ function flowsByDate(flows) {
         bal -= perDay;
         if (bal < 0) {
             bal = 0;
-            if (daysLeft = 0) {
+            if (daysLeft == 0) {
                 daysLeft = day;
             }
         }
@@ -903,6 +903,6 @@ function renderChart(chart) {
     console.log("ready to render chart");
     $("#flows-chart").html("");
     flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
-    flowsChart.destroy().render();
+    flowsChart.render();
     console.log("rendered chart");
 }
