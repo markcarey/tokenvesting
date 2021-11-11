@@ -238,44 +238,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         }
     }
 
-    function elapsedTime(address recipient, uint256 flowIndex) public view returns (uint256) {
-        require(_recipients[recipient][flowIndex].starttime > 0, "Vesting has not yet started.");
-        return block.timestamp.sub(_recipients[recipient][flowIndex].starttime);
-    }
-
-    function estimateElapsedTokens(address recipient) public view onlyRole(MANAGER) returns (uint256[] memory) {
-        uint256[] memory tokens;
-        Flow[] memory flows = _recipients[recipient];
-        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            uint256 durationEstimate = block.timestamp
-                                        .sub(_recipients[recipient][flowIndex].starttime)
-                                        .mul(toUint256(_recipients[recipient][flowIndex].flowRate));
-            tokens[flowIndex] = durationEstimate;
-        }
-        return tokens;
-    }
-
-    function estimateTotalTokens(address recipient) public onlyRole(MANAGER) view returns (uint256[] memory) {
-        uint256[] memory tokens;
-        Flow[] memory flows = _recipients[recipient];
-        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            tokens[flowIndex] = _recipients[recipient][flowIndex].vestingDuration.mul(toUint256(_recipients[recipient][flowIndex].flowRate));
-        }
-    }
-
-    function estimateRemainingTokens(address recipient) public onlyRole(MANAGER)  view returns (uint256[] memory) {
-        uint256[] memory tokens;
-        Flow[] memory flows = _recipients[recipient];
-        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            uint256 totalTokens = _recipients[recipient][flowIndex].vestingDuration.mul(toUint256(_recipients[recipient][flowIndex].flowRate));
-            uint256 elapsedTokens = block.timestamp
-                                        .sub(_recipients[recipient][flowIndex].starttime)
-                                        .mul(toUint256(_recipients[recipient][flowIndex].flowRate));
-            tokens[flowIndex] = totalTokens.sub(elapsedTokens);
-        }
-        return tokens;
-    }
-
     // now this returns an array of {Flow}s
     function getFlowRecipient(address adr) public onlyRole(MANAGER) view returns (Flow[] memory) {
         return _recipients[adr];

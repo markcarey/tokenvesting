@@ -22,6 +22,9 @@ var chart = {
     "dates": []
 };
 var flowsChart;
+var tokensVested = 0;
+var tokensRemaining = 0;
+var tokensTotal = 0;
 
 var chain = "mumbai";
 var addr = {};
@@ -169,13 +172,26 @@ async function afterConnection() {
                     }
                     flowsByAddress[flow.recipient].push(flow);
                 });
-                console.log("flowsByAddress", flowsByAddress);
-                console.log("flows", flows);
-                renderTable(flows);
-                chart = flowsByDate(flows);
-                $("#daysLeft").text(daysLeft);
-                renderChart(chart);
+                if ( i == (recipientAdresses.length - 1) ) {
+                    // last recipient
+                    tokensVested = tokensTotal - tokensRemaining;
+                    console.log("flowsByAddress", flowsByAddress);
+                    console.log("flows", flows);
+                    renderTable(flows);
+                    calcTotals(flows);
+                    chart = flowsByDate(flows);
+                    $(".daysLeft").text(daysLeft);
+                    $("#tokensVested").text(tokensVested.toFixed(0));
+                    $("#tokensRemaining").text(tokensRemaining.toFixed(0));
+                    const vestPercent = tokensVested / tokensTotal * 100;
+                    $("#tokensVestedKnob").val(vestPercent.toFixed(0));
+                    const remainingPercent = 100 - vestPercent; 
+                    $("#tokensRemainingKnob").val(remainingPercent.toFixed(0));
+                    renderKnobs();
+                    renderChart(chart, 30);
+                }
             });
+            
         } else {
             $(".section").hide();
             $(".chart_data_right.second").attr("style", "display: none !important");
@@ -185,6 +201,7 @@ async function afterConnection() {
         resolve();    
     });
 }
+
 
 function flowToObject(f) {
     var flow = {
@@ -209,6 +226,18 @@ function flowToArray(f) {
         f.state
     ];
     return flow;
+}
+
+function calcTotals(flows) {
+    var today = moment().unix();
+    $.each(flows, function(i, flow){
+        tokensTotal += flow.vestingDuration * ( flow.flowRate / (10**underlyingDecimals));
+        var elapsedDuration = today - flow.cliffEnd;
+        if (elapsedDuration > 0) {
+            tokensVested += elapsedDuration * ( flow.flowRate / (10**underlyingDecimals));
+        }
+    });
+    tokensRemaining = tokensTotal - tokensVested;
 }
 
 async function renderTable(flows) {
@@ -630,6 +659,12 @@ $( document ).ready(function() {
         afterConnection();
     });
 
+    $(".chart-days li").click(function(){
+        var days = parseInt( $(this).data("days") );
+        $(this).addClass("active").siblings().removeClass("active");
+        renderChart(chart, days);
+    });
+
     $(".navFlows").click(function(){
         $(".section").hide();
         $(".chart_data_right.second").attr("style", "display: none !important");
@@ -797,7 +832,7 @@ function flowsByDate(flows) {
         start = start.add(1, 'days');
     }
     if (bal > 0) {
-        daysLeft = "90+";
+        daysLeft = days + "+";
     }
     console.log(balances);
     console.log(flowRates);
@@ -808,14 +843,14 @@ function flowsByDate(flows) {
     return chart;
 }
 
-function renderChart(chart) {
+function renderChart(chart, days) {
     var options = {
         series: [{
             name: 'Balance',
-            data: chart.balances
+            data: chart.balances.slice(0,days)
         }, {
             name: 'flow rate',
-            data: chart.flowRates
+            data: chart.flowRates.slice(0,days)
         }],
         chart: {
             height: 240,
@@ -836,7 +871,7 @@ function renderChart(chart) {
             offsetX: 0,
             offsetY: 0,
             show: false,
-            categories: chart.dates,
+            categories: chart.dates.slice(0,days),
             labels: {
                 low: 0,
                 offsetX: 0,
@@ -856,22 +891,41 @@ function renderChart(chart) {
                 size: 6,
             }
         },
-        yaxis: {
-            low: 0,
-            offsetX: 0,
-            offsetY: 0,
-            show: false,
-            labels: {
+        yaxis: [
+                {
                 low: 0,
                 offsetX: 0,
+                offsetY: 0,
                 show: false,
+                labels: {
+                    low: 0,
+                    offsetX: 0,
+                    show: false,
+                },
+                axisBorder: {
+                    low: 0,
+                    offsetX: 0,
+                    show: false,
+                },
             },
-            axisBorder: {
+            {
+                opposite: true,
                 low: 0,
                 offsetX: 0,
+                offsetY: 0,
                 show: false,
-            },
-        },
+                labels: {
+                    low: 0,
+                    offsetX: 0,
+                    show: false,
+                },
+                axisBorder: {
+                    low: 0,
+                    offsetX: 0,
+                    show: false,
+                },
+            }
+        ],
         grid: {
             show: false,
             padding: {
@@ -905,4 +959,62 @@ function renderChart(chart) {
     flowsChart = new ApexCharts(document.querySelector("#flows-chart"), options);
     flowsChart.render();
     console.log("rendered chart");
+}
+
+function renderKnobs(){
+    $(".knob1").knob({
+
+        'width': 65,
+        'height': 65,
+        'max': 100,
+
+        change: function (value) {
+            //console.log("change : " + value);
+        },
+        release: function (value) {
+            //console.log(this.$.attr('value'));
+            console.log("release : " + value);
+        },
+        cancel: function () {
+            console.log("cancel : ", this);
+        },
+        format: function (value) {
+            return value + '%';
+        },
+        draw: function () {
+
+            // "tron" case
+            if (this.$.data('skin') == 'tron') {
+
+                this.cursorExt = 1;
+
+                var a = this.arc(this.cv)  // Arc
+                    , pa                   // Previous arc
+                    , r = 1;
+
+                this.g.lineWidth = this.lineWidth;
+
+                if (this.o.displayPrevious) {
+                    pa = this.arc(this.v);
+                    this.g.beginPath();
+                    this.g.strokeStyle = this.pColor;
+                    this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
+                    this.g.stroke();
+                }
+
+                this.g.beginPath();
+                this.g.strokeStyle = r ? this.o.fgColor : this.fgColor;
+                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, a.s, a.e, a.d);
+                this.g.stroke();
+
+                this.g.lineWidth = 2;
+                this.g.beginPath();
+                this.g.strokeStyle = this.o.fgColor;
+                this.g.arc(this.xy, this.xy, this.radius - this.lineWidth + 1 + this.lineWidth * 2 / 3, 0, 2 * Math.PI, false);
+                this.g.stroke();
+
+                return false;
+            }
+        }
+    });
 }

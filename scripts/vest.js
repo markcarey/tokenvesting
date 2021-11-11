@@ -2116,6 +2116,16 @@ async function flowTokenBalance() {
   console.log("balance is " + JSON.stringify(bal));
 }
 
+async function estimateTotalTokens(addr) {
+  const totals = await vestor.estimateTotalTokens(addr);
+  console.log(totals);
+}
+
+async function estimateRemainingTokens(addr) {
+  const totals = await vestor.estimateRemainingTokens(addr);
+  console.log(totals);
+}
+
 async function getSomeWETH(eoa) {
   await hre.network.provider.request({
     method: "hardhat_impersonateAccount",
@@ -2232,12 +2242,14 @@ async function setTimestamp(seconds) {
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
  //transaction("0x980ceb39834a3c7f9714df42d7b979c26fceea7299f678b85f5cf49f3a660a8c")
  //getBlock("0x1427066")
- //setTimestamp(1636521636)
+ //setTimestamp(1636612782)
  //flowTokenBalance()
  //vestorFlow(sToken)
  //grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
+ //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
+ //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
 
- setTimestamp(1636595650)
+ estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
