@@ -751,7 +751,7 @@ function flowsByDate(flows) {
     var start = moment().startOf('day');
     var balances = [bal];
     var flowRates = [perDay];
-    for (let day = 1; day <= days.length; day++) {
+    for (let day = 1; day <= days; day++) {
         var dayStart = start.unix();
         var end = moment(start).endOf('day');
         var dayEnd = end.unix();
