@@ -130,11 +130,15 @@ async function afterConnection() {
             console.log("superAddress", superAddress);
             const sToken = new web3.eth.Contract(superABI, superAddress);
             vestorBal = await sToken.methods.balanceOf(vestorAddress).call();
+            console.log("vestorBal", vestorBal);
             underlyingAddress = await sToken.methods.getUnderlyingToken().call();
+            console.log("underlyingAddress", underlyingAddress);
             const uToken = new web3.eth.Contract(tokenABI, underlyingAddress);
             symbol = await uToken.methods.symbol().call();
+            console.log("symbol", symbol);
             underlyingDecimals = await uToken.methods.decimals().call();
-            dailyFlow = await cfa.methods.getNetFlow(sToken, vestorAddress).call();
+            console.log("decimals", underlyingDecimals);
+            dailyFlow = await cfa.methods.getNetFlow(superAddress, vestorAddress).call();
             dailyFlow = (parseInt(dailyFlow) * -1 ) / (10**underlyingDecimals) * (60*60*24);
             if ( symbol ) {
                 underlyingSymbol = symbol;
