@@ -463,8 +463,13 @@ $( document ).ready(function() {
         var provider = new ethers.providers.JsonRpcProvider({"url": "https://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"});
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
-        var events = await ethersSTF.queryFilter(filter, block, 'latest');
-        superAddress = events[0].args.token;
+        //var events = await ethersSTF.queryFilter(filter, block, 'latest');
+        //superAddress = events[0].args.token;
+        ethersSTF.on(filter, (token, event) => { 
+            console.log("token", token);
+            console.log("events[0].args.token", events[0].args.token);
+            superAddress = events[0].args.token;
+        });
         log("super token " + underlyingSymbol + "x created at " + superAddress);
         $tab.hide().next().show();
         $("#setup-wizard span.active").removeClass("active").next().addClass("active");
