@@ -124,8 +124,10 @@ async function afterConnection() {
         console.log("vestors for user", vestors);
         if ( vestors.length > 0 ) {
             vestorAddress = vestors[vestors.length - 1];
+            console.log("vestorAddress", vestorAddress);
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
             superAddress = await vestor.methods.acceptedToken().call();
+            console.log("superAddress", superAddress);
             const sToken = new web3.eth.Contract(superABI, superAddress);
             vestorBal = await sToken.methods.balanceOf(vestorAddress).call();
             underlyingAddress = await sToken.methods.getUnderlyingToken().call();
