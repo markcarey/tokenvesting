@@ -449,6 +449,8 @@ $( document ).ready(function() {
     $("#wrap").click(async function(){
         var $tab = $(this).parents(".tab");
         status("creating super token...");
+        var $button = $(this);
+        $button.text("Creating...");
         const decimals = underlyingDecimals;
         const superTokenFactory = new web3.eth.Contract(superTokenFactoryABI, addr.SuperTokenFactory);
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
@@ -483,7 +485,9 @@ $( document ).ready(function() {
 
     $("#createVestor").click(async function(){
         var $tab = $(this).parents(".tab");
+        var $button = $(this);
         status("deploying vesting contract for " + underlyingSymbol + "x...");
+        $button.text("Deploying...");
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
         const tx = {
             'from': ethereum.selectedAddress,
@@ -509,6 +513,7 @@ $( document ).ready(function() {
             //vestorAddress = events[0].args._contract;
             vestorAddress = address;
             log("Vestor created at " + vestorAddress);
+            $button.text("Contract Deployed");
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
             $tab.next().find("p.lead").text("Deposit " + underlyingSymbol + " into vesting contract");
             $tab.hide().next().show();
@@ -563,6 +568,10 @@ $( document ).ready(function() {
                 $("#depositCard").hide();
                 $(".stats.section").show();
             }
+            afterConnection()
+                .then(function(){
+                    renderChart(flows, 30);
+                });
         } else {
             // need approval
             $("button.deposit").text("Approving...");
@@ -603,6 +612,7 @@ $( document ).ready(function() {
         var $tab = $(this).parents(".tab");
         var wizard = false;
         var $button = $(this);
+        $button.text("Adding Flow...");
         var prefix = "";
         if ( $(this).data("form") == "wizard" ) {
             wizard = true;
@@ -641,6 +651,7 @@ $( document ).ready(function() {
         var filter = await ethersVestor.filters.FlowCreated();
         ethersVestor.on(filter, (address, rate, perm, event) => { 
             status("Vesting flow added for " + flowAddress);
+            $button.text("Flow Added");
             if (wizard) {
                 $("#wizard").hide();
                 showWizard = false;
@@ -648,6 +659,7 @@ $( document ).ready(function() {
                 $("#addFlowSection").hide();
             }
             $("#flowsTable").show();
+            $button.text("Add Flow");
             if (typeof flowsChart !== 'undefined') {
                 flowsChart.destroy();
             }
@@ -660,6 +672,8 @@ $( document ).ready(function() {
     });
 
     $( "#all-flows" ).on( "click", ".launchFlow", async function() {
+        var $button = $(this);
+        $button.text("Launching...");
         const recipient = $(this).data("address");
         const flowIndex = $(this).data("flowIndex");
         const nonce = await web3.eth.getTransactionCount(accounts[0], 'latest');
@@ -685,6 +699,8 @@ $( document ).ready(function() {
     });
 
     $( "#all-flows" ).on( "click", ".stopFlow", async function() {
+        var $button = $(this);
+        $button.text("Stopping...");
         const recipient = $(this).data("address");
         const flowIndex = $(this).data("flowindex");
         console.log("flowIndex", flowIndex);
@@ -711,6 +727,8 @@ $( document ).ready(function() {
     });
 
     $("#addTeam").click(async function(){
+        var $button = $(this);
+        $button.text("Adding...");
         var teamMember = $("#teamAddress").val();
         var chosenRole = $("#teamRole").val();
         const role = roles[chosenRole];
@@ -736,6 +754,7 @@ $( document ).ready(function() {
         }
         status("Added " + teamMember + " as a " + chosenRole);
         $("#teamAddress").val("");
+        $button.text("Add Team Member");
         return false;
     });
 
