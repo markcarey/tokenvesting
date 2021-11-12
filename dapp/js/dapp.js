@@ -893,7 +893,7 @@ function flowPerDay(flowRate) {
 function flowsByDate(flows) {
     const days = 90;
     var bal = parseInt(vestorBal) / (10**underlyingDecimals);
-    var perDay = dailyFlow;
+    var perDay = 0;
     var start = moment().startOf('day');
     var balances = [];
     var flowRates = [];
