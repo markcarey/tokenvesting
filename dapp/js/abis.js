@@ -118,9 +118,34 @@ const factoryABI = [
       "stateMutability": "view",
       "type": "function"
     }
-  ];
+];
 
 const vestorABI = [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "int96",
+          "name": "flowRate",
+          "type": "int96"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "wasPermanent",
+          "type": "bool"
+        }
+      ],
+      "name": "FlowCreated",
+      "type": "event"
+    },
     {
       "anonymous": false,
       "inputs": [
@@ -354,63 +379,6 @@ const vestorABI = [
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        }
-      ],
-      "name": "estimateElapsedTokens",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        }
-      ],
-      "name": "estimateRemainingTokens",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        }
-      ],
-      "name": "estimateTotalTokens",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
         }
       ],
       "stateMutability": "view",

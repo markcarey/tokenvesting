@@ -3,7 +3,7 @@ var web3 = AlchemyWeb3.createAlchemyWeb3("wss://polygon-mumbai.g.alchemy.com/v2/
 var BN = web3.utils.BN;
 
 var showWizard = false;
-const factoryAddress = "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7";
+const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
@@ -18,6 +18,9 @@ var roles = {
     CLOSER: web3.utils.keccak256("CLOSER_ROLE")
 };
 
+const prov = {"url": "https://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"};
+var provider = new ethers.providers.JsonRpcProvider(prov);
+
 var recipientAdresses = [];
 var flowsByAddress = {};
 var flows = [];
@@ -30,6 +33,10 @@ var flowsChart;
 var tokensVested = 0;
 var tokensRemaining = 0;
 var tokensTotal = 0;
+
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+};
 
 var chain = "mumbai";
 var addr = {};
@@ -145,7 +152,7 @@ async function afterConnection() {
             vestorAddress = vestors[vestors.length - 1];
             console.log("vestorAddress", vestorAddress);
             vestor = new web3.eth.Contract(vestorABI, vestorAddress);
-            superAddress = await vestor.methods.acceptedToken().call();
+            superAddress = await vestor.methods.acceptedToken().call({'from': ethereum.selectedAddress});
             console.log("superAddress", superAddress);
             const sToken = new web3.eth.Contract(superABI, superAddress);
             vestorBal = await sToken.methods.balanceOf(vestorAddress).call();
@@ -165,10 +172,10 @@ async function afterConnection() {
             const displayBal = parseInt(vestorBal) / (10**underlyingDecimals);
             $("#vestorBal").text(displayBal.toFixed(2));
             $("#flowRate").text(dailyFlow.toFixed(2));
-            recipientAdresses = await vestor.methods.getAllAddresses().call();
+            recipientAdresses = await vestor.methods.getAllAddresses().call({'from': ethereum.selectedAddress});
             console.log("allAdresses", JSON.stringify(recipientAdresses));
             $.each(recipientAdresses, async function( i, address ) {
-                var flowsForAddress = await vestor.methods.getFlowRecipient(address).call();
+                var flowsForAddress = await vestor.methods.getFlowRecipient(address).call({'from': ethereum.selectedAddress});
                 console.log("flowsForAddress", JSON.stringify(flowsForAddress));
                 $.each(flowsForAddress, function(j, flow) {
                     console.log("flow", flow);
@@ -460,19 +467,17 @@ $( document ).ready(function() {
         //console.log(txHash);
         var pendingTxHash = txHash;
 
-        var provider = new ethers.providers.JsonRpcProvider({"url": "https://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"});
         const ethersSTF = new ethers.Contract(addr.SuperTokenFactory, superTokenFactoryABI, provider);
         var filter = await ethersSTF.filters.SuperTokenCreated();
         //var events = await ethersSTF.queryFilter(filter, block, 'latest');
         //superAddress = events[0].args.token;
         ethersSTF.on(filter, (token, event) => { 
             console.log("token", token);
-            console.log("events[0].args.token", events[0].args.token);
-            superAddress = events[0].args.token;
+            superAddress = token;
+            log("super token " + underlyingSymbol + "x created at " + superAddress);
+            $tab.hide().next().show();
+            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         });
-        log("super token " + underlyingSymbol + "x created at " + superAddress);
-        $tab.hide().next().show();
-        $("#setup-wizard span.active").removeClass("active").next().addClass("active");
         return false;
     });
 
@@ -495,16 +500,20 @@ $( document ).ready(function() {
         //console.log(txHash);
         var pendingTxHash = txHash;
 
-        var provider = new ethers.providers.JsonRpcProvider();
-        const ethersSTF = new ethers.Contract(factoryAddress, factoryABI, provider);
-        var filter = await ethersSTF.filters.VestorCreated();
-        var events = await ethersSTF.queryFilter(filter, block, 'latest');
-        vestorAddress = events[0].args._contract;
-        log("Vestor created at " + vestorAddress);
-        vestor = new web3.eth.Contract(vestorABI, vestorAddress);
-        $tab.next().find("p.lead").text("Deposit " + underlyingSymbol + " into vesting contract");
-        $tab.hide().next().show();
-        $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        const ethersFactory = new ethers.Contract(factoryAddress, factoryABI, provider);
+        var filter = await ethersFactory.filters.VestorCreated();
+        //var events = await ethersSTF.queryFilter(filter, block, 'latest');
+        ethersFactory.on(filter, (owner, address, count, event) => { 
+            console.log("address", address);
+            console.log(event);
+            //vestorAddress = events[0].args._contract;
+            vestorAddress = address;
+            log("Vestor created at " + vestorAddress);
+            vestor = new web3.eth.Contract(vestorABI, vestorAddress);
+            $tab.next().find("p.lead").text("Deposit " + underlyingSymbol + " into vesting contract");
+            $tab.hide().next().show();
+            $("#setup-wizard span.active").removeClass("active").next().addClass("active");
+        });
         return false;
     });
 
@@ -538,7 +547,11 @@ $( document ).ready(function() {
                 params: [tx],
             });
             //console.log(txHash);
-            var pendingTxHash = txHash;
+            let transactionReceipt = null
+            while (transactionReceipt == null) { 
+                transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+                await sleep(500)
+            }
             status(amt + " " + underlyingSymbol + " desposited and upgraded to " + underlyingSymbol + "x");
             $amount.val(0);
             approved = 0;
@@ -567,7 +580,11 @@ $( document ).ready(function() {
                 params: [tx],
             });
             //console.log(txHash);
-            var pendingTxHash = txHash;
+            let transactionReceipt = null
+            while (transactionReceipt == null) { 
+                transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+                await sleep(500)
+            }
             $button.text("Deposit");
             approved = amt;
             status("Approved");
@@ -620,19 +637,25 @@ $( document ).ready(function() {
             params: [tx],
         });
         console.log(txHash);
-        status("Vesting flow added for " + flowAddress);
-        if (wizard) {
-            $("#wizard").hide();
-            showWizard = false;
-        } else {
-            $("#addFlowSection").hide();
-        }
-        $("#flowsTable").show();
-        flowsChart.destroy();
-        afterConnection()
-            .then(function(){
-                renderChart(flows, 30);
-            });
+        const ethersVestor = new ethers.Contract(vestorAddress, vestorABI, provider);
+        var filter = await ethersVestor.filters.FlowCreated();
+        ethersVestor.on(filter, (address, rate, perm, event) => { 
+            status("Vesting flow added for " + flowAddress);
+            if (wizard) {
+                $("#wizard").hide();
+                showWizard = false;
+            } else {
+                $("#addFlowSection").hide();
+            }
+            $("#flowsTable").show();
+            if (typeof flowsChart !== 'undefined') {
+                flowsChart.destroy();
+            }
+            afterConnection()
+                .then(function(){
+                    renderChart(flows, 30);
+                });
+        });
         return false;
     });
 
@@ -652,6 +675,11 @@ $( document ).ready(function() {
             params: [tx],
         });
         console.log(txHash);
+        let transactionReceipt = null
+        while (transactionReceipt == null) { 
+            transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+            await sleep(500)
+        }
         status("Vesting flow(s) launched for " + recipient);
         afterConnection();
     });
@@ -673,6 +701,11 @@ $( document ).ready(function() {
             params: [tx],
         });
         console.log(txHash);
+        let transactionReceipt = null
+        while (transactionReceipt == null) { 
+            transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+            await sleep(500)
+        }
         status("Vesting flow stopped");
         afterConnection();
     });
@@ -696,7 +729,11 @@ $( document ).ready(function() {
             params: [tx],
         });
         //console.log(txHash);
-        var pendingTxHash = txHash;
+        let transactionReceipt = null
+        while (transactionReceipt == null) { 
+            transactionReceipt = await web3.eth.getTransactionReceipt(txHash);
+            await sleep(500)
+        }
         status("Added " + teamMember + " as a " + chosenRole);
         $("#teamAddress").val("");
         return false;
@@ -862,6 +899,9 @@ function flowsByDate(flows) {
                 perDay -= flowPerDay(flow.flowRate);
             }
         });
+        if ( perDay < 0 ) {
+            preDay = 0;
+        }
         bal -= perDay;
         if (bal < 0) {
             bal = 0;
@@ -869,8 +909,8 @@ function flowsByDate(flows) {
                 daysLeft = day;
             }
         }
-        balances.push(bal);
-        flowRates.push(perDay);
+        balances.push(bal.toFixed(4));
+        flowRates.push(perDay.toFixed(4));
         dates.push(start.format("YYYY-MM-DD"));
         start = start.add(1, 'days');
     }

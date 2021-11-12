@@ -46,6 +46,12 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         bool wasPermanent
     );
 
+    event FlowCreated(
+        address recipient,
+        int96 flowRate,
+        bool wasPermanent
+    );
+
     ISuperfluid _host;
     IConstantFlowAgreementV1 _cfa;
     ISuperToken public acceptedToken;
@@ -100,7 +106,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     modifier onlyManager() {
-        require(hasRole(MANAGER,msg.sender) || 
+        require(hasRole(MANAGER, msg.sender) || 
                 hasRole(DEFAULT_ADMIN_ROLE, msg.sender), 
                 "Only allowed by Manager");
         _;
@@ -281,6 +287,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             recipientAddresses.push(adr);
         }
         _recipients[adr].push(newFlow);
+        emit FlowCreated(adr, flowRate, isPermanent);
         return newFlow;
     }
 
