@@ -241,19 +241,25 @@
                                 <input id="wizardEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
                               </div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 total-amount-field">
+                              <label for="wizardTotalAmount">Amount:</label>
+                              <input class="form-control" id="wizardTotalAmount" type="text" placeholder="0" data-bs-original-title="" title="">
+                              <div><a href="#" class="per-time-period">Or choose an amount per day, month, or year</a></div>
+                            </div>
+                            <div class="mb-3 time-period-fields" style="display: none;">
                                 <div class="row">
-                                    <div class="col-auto"><label for="wizardAddress">Amount:</label>
+                                    <div class="col-auto"><label for="wizardFlowAmount">Amount:</label>
                                         <input class="form-control" id="wizardFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
                                     </div> 
                                     <div class="col-auto">
-                                        <label for="wizardAddress">Per:</label>
+                                        <label for="wizardFlowSeconds">Per:</label>
                                         <select class="form-select" id="wizardFlowSeconds" style="display: inline-block;">
                                           <option value="86400">Day</option>
                                           <option value="2952000">Month</option>
                                           <option value="31536000">Year</option>
                                         </select>
                                     </div>
+                                    <div><a href="#" class="total-amount">Or choose the total amount to vest</a></div>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -332,7 +338,12 @@
                                 <input id="sectionEnd" class="datepicker-here form-control digits" type="text" data-language="en" data-bs-original-title="" title="">
                               </div>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 total-amount-field">
+                              <label for="sectionTotalAmount">Amount:</label>
+                              <input class="form-control" id="sectionTotalAmount" type="text" placeholder="0" data-bs-original-title="" title="">
+                              <div><a href="#" class="per-time-period">Or choose an amount per day, month, or year</a></div>
+                            </div>
+                            <div class="mb-3 time-period-fields" style="display: none;">
                                 <div class="row">
                                     <div class="col-auto"><label for="sectionFlowAmount">Amount:</label>
                                         <input class="form-control" id="sectionFlowAmount" type="text" placeholder="0" data-bs-original-title="" title="">
@@ -345,6 +356,7 @@
                                           <option value="31536000">Year</option>
                                         </select>
                                     </div>
+                                    <div><a href="#" class="total-amount">Or choose the total amount to vest</a></div>
                                 </div>
                             </div>
                             <div class="mb-3">

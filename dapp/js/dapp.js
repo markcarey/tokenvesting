@@ -608,6 +608,16 @@ $( document ).ready(function() {
         return false;
     });
 
+    $(".per-time-period").click(function(){
+        $(".total-amount-field").hide().find("input").val("");
+        $(".time-period-fields").show();
+    });
+
+    $(".total-amount").click(function(){
+        $(".total-amount-field").show();
+        $(".time-period-fields").hide().find("input").val("");
+    });
+
     $("#addFlow, #addFlowCard").click(async function(){
         var $tab = $(this).parents(".tab");
         var wizard = false;
@@ -625,9 +635,20 @@ $( document ).ready(function() {
         var end = moment( $("#" + prefix + "End").val() );
         var duration = end.unix() - start.unix();;
         console.log("duration", duration);
+        var flowRate = 0;
+        var seconds = 0;
         var amount = $("#" + prefix + "FlowAmount").val();
-        var seconds = $("#" + prefix + "FlowSeconds").val();
-        var flowRate = parseInt( amount / seconds * ( 10**underlyingDecimals) );
+        if (amount) {
+            seconds = $("#" + prefix + "FlowSeconds").val();
+        } else {
+            amount = $("#" + prefix + "TotalAmount").val();
+            if (!amount) {
+                console.log("ERROR: no amount specified");
+                return;
+            }
+            seconds = duration;
+        }
+        flowRate = parseInt( amount / seconds * ( 10**underlyingDecimals) );
         console.log("flowRate", flowRate);
         var permanent = false;
         if ( $("#" + prefix + "Permanent:checked").val() ) {
