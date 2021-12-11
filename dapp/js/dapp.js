@@ -334,11 +334,13 @@ async function renderTable(flows) {
                             actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-success btn-xs launchFlow" type="button" title="Ready to start flowing">Launch</button>`;
                         }
                     } else if ( state == 1 ) {
-                        if (!full.permanent) { 
-                            actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
-                        }
-                        if ( ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000) ) {
+                        var ended = ( parseInt(full.cliffEnd) + parseInt(full.vestingDuration) ) < (Date.now()/1000);
+                        if ( ended ) {
                             actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="ready to be closed">Close</button>`;
+                        } else {
+                            if (!full.permanent) { 
+                                actions += `<button data-address="${full.recipient}" data-flowIndex="${full.flowIndex}" class="btn btn-danger btn-xs stopFlow" type="button" title="still flowing but you can stop it early">Stop Early</button>`;
+                            }
                         }
                     }
                     return actions;

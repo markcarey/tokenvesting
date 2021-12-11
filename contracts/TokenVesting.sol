@@ -251,6 +251,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
             // decrease the outflow by flowRate
             updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
+            flowRates[recipient] = outFlowRate - _recipients[recipient][flowIndex].flowRate;
         } else {
 
             _host.callAgreement(
@@ -264,11 +265,11 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 ),
                 new bytes(0)
             );
-
+            
             flowRates[recipient] = 0;
-            _recipients[recipient][flowIndex].state = FlowState.Stopped;
-            emit FlowStopped(recipient,  _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
         }
+        _recipients[recipient][flowIndex].state = FlowState.Stopped;
+        emit FlowStopped(recipient,  _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
     }
 
     // now this returns an array of {Flow}s
