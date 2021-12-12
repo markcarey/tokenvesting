@@ -3,7 +3,7 @@ var web3 = AlchemyWeb3.createAlchemyWeb3("wss://polygon-mumbai.g.alchemy.com/v2/
 var BN = web3.utils.BN;
 
 var showWizard = false;
-const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
+const factoryAddress = "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
@@ -145,6 +145,7 @@ async function afterConnection() {
         flowsByAddress = {};
         flows = []
         $("li.profile-nav").find(".media-body span").text( abbrAddress() );
+        $(".profile-media img").attr("src", "https://web3-images-api.kibalabs.com/v1/accounts/" + ethereum.selectedAddress + "/image").css("width", "37px");
         status("Connected as " + abbrAddress() );
         const vestors = await factory.methods.getVestorsForUser(ethereum.selectedAddress).call();
         console.log("vestors for user", vestors);
@@ -267,7 +268,8 @@ async function renderTable(flows) {
                 render: function ( data, type, full, meta ) {
                     var addr = full.recipient;
                     var short = abbrAddress(addr);
-                    return `<span title="${addr}">${short}</span>`;
+                    var img = "https://web3-images-api.kibalabs.com/v1/accounts/" + addr + "/image";
+                    return `<img src="${img}" style="width:21px;border-radius:4px;" /> <span title="${addr}">${short}</span>`;
                 }
             },
             { 
