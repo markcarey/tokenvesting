@@ -1,9 +1,24 @@
-var web3 = AlchemyWeb3.createAlchemyWeb3("wss://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj");
+var chain = "rinkeby";
+
+var rpcURLs = {};
+rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57";
+rpcURLs.mumbai = "polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
+rpcURLs.polygon = "polygon-mainnet.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
+
+var rpcURL = rpcURLs[chain];
+
+var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
 //var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 var showWizard = false;
-const factoryAddress = "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
+
+var factories = {};
+factories.rinkeby =     "0x51966854bC779747f959522F4c621fDCA4160338";
+factories.mumbai =      "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
+factories.polygon = "";
+var factoryAddress = factories[chain];
+
 var vestorAddress = "";
 var underlyingAddress = "";
 var underlyingSymbol = "";
@@ -18,7 +33,7 @@ var roles = {
     CLOSER: web3.utils.keccak256("CLOSER_ROLE")
 };
 
-const prov = {"url": "https://polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj"};
+const prov = {"url": "https://" + rpcURL};
 var provider = new ethers.providers.JsonRpcProvider(prov);
 
 var recipientAdresses = [];
@@ -38,7 +53,6 @@ const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 };
 
-var chain = "mumbai";
 var addr = {};
 if (chain == "mumbai") {
     //Mumbai:
@@ -65,6 +79,28 @@ if (chain == "polygon") {
     addr.WBTC = "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6";
     addr.WBTCx = "0x4086eBf75233e8492F1BCDa41C7f2A8288c2fB92";
     addr.DAIx = "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2";
+}
+if ( chain == "rinkeby" ) {
+    // Rinkeby
+    blockExplorer = "https://rinkeby.etherscan.io/";
+    addr.router = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+    addr.Resolver = "0x659635Fab0A0cef1293f7eb3c7934542B6A6B31A";
+    addr.SuperTokenFactory = "0xd465e36e607d493cd4CC1e83bea275712BECd5E0";
+    addr.SuperHost = "0xeD5B5b32110c3Ded02a07c8b8e97513FAfb883B6";
+    addr.cfa = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
+    addr.WETH = "0xc778417E063141139Fce010982780140Aa0cD5Ab";
+    addr.DAI = "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa";
+    addr.USDC = "";
+    addr.ETHx = "0xa623b2DD931C5162b7a0B25852f4024Db48bb1A0";
+    addr.WETHx = addr.ETHx; // "0x3FbcaeaA76d6f7Fe31DaEa1655b97F1436c0a747";
+    addr.USDCx = "";
+    addr.WBTC = "";
+    addr.WBTCx = "";
+    addr.DAIx = "";
+    addr.fDAI = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
+    addr.fDAIx = "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90";
+    addr.fUSDC = "0xbe49ac1EadAc65dccf204D4Df81d650B50122aB2";
+    addr.fUSDCx = "0x0F1D7C55A2B133E000eA10EeC03c774e0d6796e8";
 }
 
 const WETH = new web3.eth.Contract(tokenABI, addr.WETH); // need this?
