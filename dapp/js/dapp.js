@@ -5,6 +5,7 @@ rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57
 rpcURLs.mumbai = "polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 rpcURLs.polygon = "polygon-mainnet.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 
+//rpcURLs.rinkeby = "localhost:8545";  // CHANGE THIS!!!!!!
 var rpcURL = rpcURLs[chain];
 
 var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
@@ -14,7 +15,7 @@ var BN = web3.utils.BN;
 var showWizard = false;
 
 var factories = {};
-factories.rinkeby =     "0x51966854bC779747f959522F4c621fDCA4160338";
+factories.rinkeby =     "0x7F2f142480F474EBd8ff60F4A835066e7Dd38826"; 
 factories.mumbai =      "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
 factories.polygon = "";
 var factoryAddress = factories[chain];
@@ -34,6 +35,7 @@ var roles = {
 };
 
 const prov = {"url": "https://" + rpcURL};
+//const prov = {"url": "http://" + rpcURL};       // localhost only
 var provider = new ethers.providers.JsonRpcProvider(prov);
 
 var recipientAdresses = [];
@@ -448,7 +450,7 @@ $( document ).ready(function() {
         var wrapIt = false;
         var symbol = "";
         if ( underlying == "other" ) {
-            underlyingAddress = $("underlyingCustom").val();
+            underlyingAddress = $("#underlyingCustom").val();
             const token = new web3.eth.Contract(tokenABI, underlyingAddress);
             symbol = await token.methods.symbol().call();
             underlyingDecimals = await token.methods.decimals().call();

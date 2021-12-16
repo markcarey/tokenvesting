@@ -1,5 +1,6 @@
 async function main() {
     const Factory = await ethers.getContractFactory("VestingFactory");
+    //const Factory = await ethers.getContractFactory("TokenVestor");
     
     // Start deployment, returning a promise that resolves to a contract object
     const contract = await Factory.deploy();

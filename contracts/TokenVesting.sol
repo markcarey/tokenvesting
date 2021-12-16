@@ -59,6 +59,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     address[] recipientAddresses;
     mapping(address => Flow[]) _recipients;
     mapping(address => int96) flowRates;
+    address nextCloseAddress;
+    uint256 nextCloseDate;
 
     bytes32 public constant MANAGER = keccak256("MANAGER_ROLE");
     bytes32 public constant GRANTOR = keccak256("GRANTOR_ROLE");
@@ -80,19 +82,24 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             _host = ISuperfluid(0x3E14dC1b13c488a8d5D310918780c983bD5982E7);
             _cfa = IConstantFlowAgreementV1(0x6EeE6060f715257b970700bc2656De21dEdF074C);
         }
-        if ( block.chainid == 80001 || block.chainid == 31337 ) {
+        if ( block.chainid == 80001 ) {
             _host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
             _cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
         }
+        if ( block.chainid == 4 || block.chainid == 31337 ) {
+            _host = ISuperfluid(0xeD5B5b32110c3Ded02a07c8b8e97513FAfb883B6);
+            _cfa = IConstantFlowAgreementV1(0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A);
+        }
 
         // Mumbai: change this!!!
-        _host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
-        _cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
+        //_host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
+        //_cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
 
 
         acceptedToken = ISuperToken(_acceptedToken);
         admin = owner;
         factory = IVestingFactory(msg.sender);
+        nextCloseDate = 2524608000;
 
         //Access Control
         console.log("before any role granting");
@@ -218,18 +225,54 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         return elapsed;
     }
 
+    // for Gelato Network
+    function closeReady() external view returns(bool canExec, bytes memory execPayload) {
+        if ( nextCloseAddress == address(0) ) {
+            canExec = false;
+        } else {
+            Flow[] memory flows = _recipients[nextCloseAddress];
+            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+                if (elapsedTime(nextCloseAddress, flowIndex) > flows[flowIndex].vestingDuration) {
+                    canExec = true;
+                    execPayload = abi.encodeWithSelector(
+                        this.closeVestingForAddress.selector,
+                        address(nextCloseAddress)
+                    );
+                }
+            }
+        }
+    }
+    function closeVestingForAddress(address addr) public {
+        Flow[] memory flows = _recipients[addr];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
+                closeStream(addr, flowIndex);
+            }
+        }
+        // now update nextCloseAddress (expensive?)
+        nextCloseAddress = findNextCloseAddress();
+    }
+
+    function setNextClose(address _addr, uint256 _closeDate) public atLeastCloser {
+        require(_addr != address(0), "!zero addr");
+        require(_closeDate > nextCloseDate, "!not next");
+        nextCloseDate = _closeDate;
+        nextCloseAddress = _addr;
+    }
+
     function closeVesting(address[] calldata recipientAddresses) public atLeastCloser {
         for(uint i = 0; i < recipientAddresses.length; i++) {
             address addr = recipientAddresses[i];
             Flow[] memory flows = _recipients[addr];
             for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
                 if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
-                    closeOrUpdateStream(addr, flowIndex);
+                    closeStream(addr, flowIndex);
                 }
             }
         }
     }
 
+    // TODO: delete this function? no longer needed?
     function closeOrUpdateStream(address recipient, uint256 flowIndex) internal {
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
         if (outFlowRate == _recipients[recipient][flowIndex].flowRate) {
@@ -265,7 +308,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 ),
                 new bytes(0)
             );
-            
+
             flowRates[recipient] = 0;
         }
         _recipients[recipient][flowIndex].state = FlowState.Stopped;
@@ -288,8 +331,33 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             recipientAddresses.push(adr);
         }
         _recipients[adr].push(newFlow);
+        if ( cliffEnd.add(vestingDuration) < nextCloseDate ) {
+            nextCloseDate = cliffEnd.add(vestingDuration);
+            nextCloseAddress = adr;
+        }
         emit FlowCreated(adr, flowRate, isPermanent);
         return newFlow;
+    }
+
+    function closeDate(address recipient, uint256 flowIndex) internal view returns(uint256) {
+        return _recipients[recipient][flowIndex].cliffEnd.add(_recipients[recipient][flowIndex].vestingDuration);
+    }
+
+    function findNextCloseAddress() internal returns(address) {
+        uint256 nextDate = 2524608000;
+        address nextAddress;
+        for(uint i = 0; i < recipientAddresses.length; i++) {
+            address addr = recipientAddresses[i];
+            Flow[] memory flows = _recipients[addr];
+            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+                if ( closeDate(addr, flowIndex) < nextDate ) {
+                    nextDate = closeDate(addr, flowIndex);
+                    nextAddress = addr;
+                }
+            }
+        }
+        nextCloseDate = nextDate;
+        return nextAddress;
     }
 
     function isRecipientRegistered(address adr) internal view returns (bool) {
