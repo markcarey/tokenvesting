@@ -7,7 +7,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0x772e7649d729D2Ba922BE3dEc2eBe627e82dcCBA";
+const vestorAddress = "0x65c86BD7F8484b74947C680FbCCAFb33d76B4E27";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2151,7 +2151,7 @@ async function main() {
 
 async function addFlow() {
   //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
-  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1639665474, 60*10);
+  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1639938671, 60*10);
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
 }

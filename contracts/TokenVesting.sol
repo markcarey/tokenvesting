@@ -42,12 +42,21 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     event FlowStopped(
         address recipient,
+        uint256 flowIndex,
         int96 flowRate,
         bool wasPermanent
     );
 
     event FlowCreated(
         address recipient,
+        uint256 flowIndex,
+        int96 flowRate,
+        bool wasPermanent
+    );
+
+    event FlowStarted(
+        address recipient,
+        uint256 flowIndex,
         int96 flowRate,
         bool wasPermanent
     );
@@ -162,6 +171,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 if (block.timestamp > flows[flowIndex].cliffEnd) {
                     console.log("before createOrUpdate");
                     createOrUpdateStream(recipientAddresses[i], flowIndex);
+                    emit FlowStarted(addr, flowIndex, _recipients[addr][flowIndex].flowRate, isPermanentFlow(addr, flowIndex));
                 }
             }
         }
@@ -315,7 +325,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             flowRates[recipient] = 0;
         }
         _recipients[recipient][flowIndex].state = FlowState.Stopped;
-        emit FlowStopped(recipient,  _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
+        emit FlowStopped(recipient, flowIndex, _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
     }
 
     // now this returns an array of {Flow}s
@@ -338,7 +348,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             nextCloseDate = cliffEnd.add(vestingDuration);
             nextCloseAddress = adr;
         }
-        emit FlowCreated(adr, flowRate, isPermanent);
+        emit FlowCreated(adr, _recipients[adr].length, flowRate, isPermanent);
         return newFlow;
     }
 
