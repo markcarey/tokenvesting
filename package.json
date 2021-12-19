@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/markcarey/tokenvesting#readme",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.7",
-    "ethers": "^5.5.1",
-    "hardhat": "^2.6.7"
+    "@nomiclabs/hardhat-ethers": "^2.0.3",
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
+    "ethers": "^5.5.2",
+    "hardhat": "^2.8.0"
   },
   "dependencies": {
     "@nomiclabs/hardhat-web3": "^2.0.0",

@@ -246,7 +246,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         Flow[] memory flows = _recipients[addr];
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
             if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
-                closeStream(addr, flowIndex);
+                _closeStream(addr, flowIndex);
             }
         }
         // now update nextCloseAddress (expensive?)
@@ -289,7 +289,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         if(elapsedTime(recipient, flowIndex) < _recipients[recipient][flowIndex].vestingDuration) {
             require(!isPermanentFlow(recipient, flowIndex), "Stream is permanent and cannot be closed.");
         }
+        _closeStream(recipient, flowIndex);
+    }
 
+    function _closeStream(address recipient, uint256 flowIndex) internal {
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
         if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
             // decrease the outflow by flowRate
