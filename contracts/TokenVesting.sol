@@ -168,7 +168,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             Flow[] memory flows = _recipients[addr];
             for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
                 console.log("starting on flow with flowIndex", flowIndex);
-                if (flows[flowIndex].state == FlowState.Flowing) {
+                if (flows[flowIndex].state == FlowState.Registered) {
                     if (block.timestamp > flows[flowIndex].cliffEnd) {
                         console.log("before createOrUpdate");
                         createOrUpdateStream(recipientAddresses[i], flowIndex);
