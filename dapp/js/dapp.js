@@ -15,7 +15,7 @@ var BN = web3.utils.BN;
 var showWizard = false;
 
 var factories = {};
-factories.rinkeby =     "0xD510f6561c02B41424c709C201F23B484A6684a7"; 
+factories.rinkeby =     "0x07FfE83EE05b75A4C1939D4Ba3F967934ED61758"; 
 factories.mumbai =      "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
 factories.polygon = "";
 var factoryAddress = factories[chain];

@@ -68,8 +68,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     address[] recipientAddresses;
     mapping(address => Flow[]) _recipients;
     mapping(address => int96) flowRates;
-    address nextCloseAddress;
-    uint256 nextCloseDate;
+    address public nextCloseAddress;
+    uint256 public nextCloseDate;
 
     bytes32 public constant MANAGER = keccak256("MANAGER_ROLE");
     bytes32 public constant GRANTOR = keccak256("GRANTOR_ROLE");
@@ -168,10 +168,12 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             Flow[] memory flows = _recipients[addr];
             for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
                 console.log("starting on flow with flowIndex", flowIndex);
-                if (block.timestamp > flows[flowIndex].cliffEnd) {
-                    console.log("before createOrUpdate");
-                    createOrUpdateStream(recipientAddresses[i], flowIndex);
-                    emit FlowStarted(addr, flowIndex, _recipients[addr][flowIndex].flowRate, isPermanentFlow(addr, flowIndex));
+                if (flows[flowIndex].state == FlowState.Flowing) {
+                    if (block.timestamp > flows[flowIndex].cliffEnd) {
+                        console.log("before createOrUpdate");
+                        createOrUpdateStream(recipientAddresses[i], flowIndex);
+                        emit FlowStarted(addr, flowIndex, _recipients[addr][flowIndex].flowRate, isPermanentFlow(addr, flowIndex));
+                    }
                 }
             }
         }
