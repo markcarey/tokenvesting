@@ -257,8 +257,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     function closeVestingForAddress(address addr) public {
         Flow[] memory flows = _recipients[addr];
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
-                _closeStream(addr, flowIndex);
+            if (flows[flowIndex].state == FlowState.Flowing) {
+                if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
+                    _closeStream(addr, flowIndex);
+                }
             }
         }
         // now update nextCloseAddress (expensive?)
@@ -277,8 +279,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             address addr = recipientAddresses[i];
             Flow[] memory flows = _recipients[addr];
             for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-                if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
-                    closeStream(addr, flowIndex);
+                if (flows[flowIndex].state == FlowState.Flowing) {
+                    if (elapsedTime(addr, flowIndex) > flows[flowIndex].vestingDuration) {
+                        closeStream(addr, flowIndex);
+                    }
                 }
             }
         }

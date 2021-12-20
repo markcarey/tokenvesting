@@ -9,6 +9,10 @@ const vestorAddress = "0x4d4ECca72249012A1135520a5bD15F1A252cF045";
 
 const signer = new ethers.Wallet(PRIVATE_KEY, ethers.provider);
 
+function uniq(a) {
+  return Array.from(new Set(a));
+}
+
 let vestor = new ethers.Contract(
   vestorAddress,
   vestorJSON.abi,
@@ -19,6 +23,7 @@ async function closer() {
   var ready = false;
   var nextDate;
   var nextAddress;
+  var toClose = [];
   var now = Math.floor(Date.now() / 1000);
   nextDate = await vestor.nextCloseDate();
   console.log("nextDate", nextDate);
@@ -29,7 +34,8 @@ async function closer() {
     // double check
     var flows = await vestor.getFlowRecipient(nextAddress);
     console.log("flows", flows);
-    flows.forEach(async function(flow, flowIndex) {
+    for (let flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+      var flow = flows[flowIndex];
       var start = parseInt(flow.cliffEnd);
       if ( parseInt(flow.starttime) > 0 ) {
         start = parseInt(flow.starttime);
@@ -38,20 +44,26 @@ async function closer() {
       console.log("endDate", endDate);
       console.log("now", now);
       if ( ( flow.state == 1 ) && ( endDate < now ) ) {
-        console.log("ready close vesting for " + nextAddress);
-        var result = await vestor.closeVesting([nextAddress]);
-        await result.wait(5);
+        toClose.push(nextAddress);
       }
       if (flowIndex === flows.length - 1) {
-
+        if ( toClose.length > 0 ) {
+          toClose = uniq(toClose);
+          console.log("ready close vesting for ", toClose);
+          var result = await vestor.closeVesting(toClose);
+          await result.wait(5);
+          console.log("after waiting for close function");
+        }
         // now set next
         nextDate = 2524608000;
         var recipients = await vestor.getAllAddresses();
         console.log("recipients", recipients);
-        await recipients.forEach(async function(adr, idx) {
+        for (let i = 0; i < recipients.length; i++) {
+          var adr = recipients[i];
           var flowsForAddress = await vestor.getFlowRecipient(adr);
           console.log("flowsForAddress", flowsForAddress);
-          flowsForAddress.forEach(function(flow) {
+          for (let flowIndex = 0; flowIndex < flowsForAddress.length; flowIndex++) {
+            var flow = flowsForAddress[flowIndex];
             var start = parseInt(flow.cliffEnd);
             if ( parseInt(flow.starttime) > 0 ) {
               start = parseInt(flow.starttime);
@@ -62,18 +74,20 @@ async function closer() {
               nextDate = endDate;
               nextAddress = flow.recipient;
             }
-          });
-          if (idx === recipients.length - 1) {
+          }
+          if (i === recipients.length - 1) {
             // last address
             console.log("next next", nextDate, nextAddress);
-            await vestor.setNextClose(nextAddress, nextDate);
+            var result = await vestor.setNextClose(nextAddress, nextDate);
+            await result.wait(5);
+            console.log("after waiting for setNext");
             console.log( await vestor.nextCloseDate() );
             console.log( await vestor.nextCloseAddress() );
           }
-        });
+        }
 
       }
-    });
+    }
 
     
     
