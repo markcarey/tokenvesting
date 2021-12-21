@@ -394,6 +394,19 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.vestingDuration,
             newFlow.starttime  
         );
+        if (block.timestamp > newFlow.cliffEnd) {
+            createOrUpdateStream(adr, _recipients[adr].length);
+            emit FlowStarted(
+                adr, 
+                _recipients[adr].length, 
+                newFlow.flowRate, 
+                newFlow.permanent,
+                newFlow.state,
+                newFlow.cliffEnd,
+                newFlow.vestingDuration,
+                newFlow.starttime  
+            );
+        }
         return newFlow;
     }
 
