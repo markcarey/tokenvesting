@@ -44,21 +44,33 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         address recipient,
         uint256 flowIndex,
         int96 flowRate,
-        bool wasPermanent
+        bool permanent,
+        FlowState state,
+        uint256 cliffEnd,
+        uint256 vestingDuration,
+        uint256 starttime
     );
 
     event FlowCreated(
         address recipient,
         uint256 flowIndex,
         int96 flowRate,
-        bool wasPermanent
+        bool permanent,
+        FlowState state,
+        uint256 cliffEnd,
+        uint256 vestingDuration,
+        uint256 starttime
     );
 
     event FlowStarted(
         address recipient,
         uint256 flowIndex,
         int96 flowRate,
-        bool wasPermanent
+        bool permanent,
+        FlowState state,
+        uint256 cliffEnd,
+        uint256 vestingDuration,
+        uint256 starttime
     );
 
     ISuperfluid _host;
@@ -172,7 +184,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                     if (block.timestamp > flows[flowIndex].cliffEnd) {
                         console.log("before createOrUpdate");
                         createOrUpdateStream(recipientAddresses[i], flowIndex);
-                        emit FlowStarted(addr, flowIndex, _recipients[addr][flowIndex].flowRate, isPermanentFlow(addr, flowIndex));
+                        emit FlowStarted(
+                            addr, 
+                            flowIndex, 
+                            _recipients[addr][flowIndex].flowRate, 
+                            _recipients[addr][flowIndex].permanent,
+                            _recipients[addr][flowIndex].state,
+                            _recipients[addr][flowIndex].cliffEnd,
+                            _recipients[addr][flowIndex].vestingDuration,
+                            _recipients[addr][flowIndex].starttime  
+                        );
                     }
                 }
             }
@@ -331,7 +352,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             flowRates[recipient] = 0;
         }
         _recipients[recipient][flowIndex].state = FlowState.Stopped;
-        emit FlowStopped(recipient, flowIndex, _recipients[recipient][flowIndex].flowRate, isPermanentFlow(recipient, flowIndex));
+        emit FlowStopped(
+            recipient, 
+            flowIndex, 
+            _recipients[recipient][flowIndex].flowRate, 
+            _recipients[recipient][flowIndex].permanent,
+            _recipients[recipient][flowIndex].state,
+            _recipients[recipient][flowIndex].cliffEnd,
+            _recipients[recipient][flowIndex].vestingDuration,
+            _recipients[recipient][flowIndex].starttime  
+        );
     }
 
     // now this returns an array of {Flow}s
@@ -354,7 +384,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             nextCloseDate = cliffEnd.add(vestingDuration);
             nextCloseAddress = adr;
         }
-        emit FlowCreated(adr, _recipients[adr].length, flowRate, isPermanent);
+        emit FlowCreated(
+            adr, 
+            _recipients[adr].length, 
+            newFlow.flowRate, 
+            newFlow.permanent,
+            newFlow.state,
+            newFlow.cliffEnd,
+            newFlow.vestingDuration,
+            newFlow.starttime  
+        );
         return newFlow;
     }
 
