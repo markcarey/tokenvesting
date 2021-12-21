@@ -129,6 +129,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
         console.log("after granting DEFAULT admin role");
         _setupRole(MANAGER, admin);
+        _setupRole(MANAGER, address(this));
         _setupRole(GRANTOR, admin);
         _setupRole(CLOSER, admin);
     }
@@ -384,9 +385,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             nextCloseDate = cliffEnd.add(vestingDuration);
             nextCloseAddress = adr;
         }
+        uint256 flowIndex = _recipients[adr].length - 1;
         emit FlowCreated(
             adr, 
-            _recipients[adr].length, 
+            flowIndex, 
             newFlow.flowRate, 
             newFlow.permanent,
             newFlow.state,
@@ -395,10 +397,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.starttime  
         );
         if (block.timestamp > newFlow.cliffEnd) {
-            createOrUpdateStream(adr, _recipients[adr].length);
+            createOrUpdateStream(adr, flowIndex);
             emit FlowStarted(
                 adr, 
-                _recipients[adr].length, 
+                flowIndex, 
                 newFlow.flowRate, 
                 newFlow.permanent,
                 newFlow.state,
@@ -408,6 +410,13 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             );
         }
         return newFlow;
+    }
+
+    function registerBatch(address[] calldata adr, int96[] calldata flowRate, bool[] calldata isPermanent, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration) public atLeastGrantor {
+        //TODO: check that lengths match
+        for(uint i = 0; i < adr.length; i++) {
+            this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i]);
+        }
     }
 
     function closeDate(address recipient, uint256 flowIndex) internal view returns(uint256) {

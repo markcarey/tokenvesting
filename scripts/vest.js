@@ -7,7 +7,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0xC329C4ca308dd67017DeAD00Ab5e6e5C815904d6";
+const vestorAddress = "0xEAfA8600Fe913481910b0618036A7176Ba2A4cCE";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2151,7 +2151,28 @@ async function main() {
 
 async function addFlow() {
   //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
-  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1640009331, 60*10);
+  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1640112967, 60*10);
+  const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
+  console.log("Flows are " + JSON.stringify(flows));
+}
+
+async function addBatch() {
+  //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
+  var addr = [];
+  var fr = [];
+  var perm = [];
+  var cliff = [];
+  var dur = [];
+  var start = 1640112967;
+  for (let i = 0; i < 10; i++) {
+    start += 600;
+    addr[i] = PUBLIC_KEY;
+    fr[i] = 123456;
+    perm[i] = false;
+    cliff[i] = start;
+    dur[i] = 60*10;
+  }
+  await vestor.registerBatch(addr, fr, perm, cliff, dur);
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
 }
@@ -2329,7 +2350,8 @@ async function upgrade() {
 
 
  //clone();
- addFlow()
+ //addFlow()
+ addBatch()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
  //mintSomeDAI()
