@@ -1,4 +1,5 @@
 require('dotenv').config();
+var crypto = require('crypto');
 const API_URL = process.env.API_URL;
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -7,7 +8,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0xEAfA8600Fe913481910b0618036A7176Ba2A4cCE";
+const vestorAddress = "0x6F85ACFe156343720C27eB1B40aAD94B410D168b";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2156,6 +2157,13 @@ async function addFlow() {
   console.log("Flows are " + JSON.stringify(flows));
 }
 
+function randomAddress() {
+  var id = crypto.randomBytes(32).toString('hex');
+  var privateKey = "0x"+id;
+  var wallet = new ethers.Wallet(privateKey);
+  return wallet.address;
+}
+
 async function addBatch() {
   //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
   var addr = [];
@@ -2164,15 +2172,36 @@ async function addBatch() {
   var cliff = [];
   var dur = [];
   var start = 1640112967;
-  for (let i = 0; i < 10; i++) {
-    start += 600;
-    addr[i] = PUBLIC_KEY;
+  for (let i = 0; i < 25; i++) {
+    start += 0;
+    addr[i] = randomAddress();
     fr[i] = 123456;
     perm[i] = false;
     cliff[i] = start;
     dur[i] = 60*10;
   }
   await vestor.registerBatch(addr, fr, perm, cliff, dur);
+  const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
+  console.log("Flows are " + JSON.stringify(flows));
+}
+
+async function addBatchCall() {
+  //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
+  var addr = [];
+  var fr = [];
+  var perm = [];
+  var cliff = [];
+  var dur = [];
+  var start = 1640112967;
+  for (let i = 0; i < 25; i++) {
+    start += 0;
+    addr[i] = randomAddress();
+    fr[i] = 123456;
+    perm[i] = false;
+    cliff[i] = start;
+    dur[i] = 60*10;
+  }
+  await vestor.registerBatchCall(addr, fr, perm, cliff, dur);
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
 }
@@ -2352,6 +2381,7 @@ async function upgrade() {
  //clone();
  //addFlow()
  addBatch()
+ //addBatchCall()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
  //mintSomeDAI()

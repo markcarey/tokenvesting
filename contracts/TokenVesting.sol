@@ -4,11 +4,13 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
-import {
-    ISuperfluid,
-    ISuperToken,
-    ISuperAgreement
-} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
+//import {
+//    ISuperfluid,
+//    ISuperToken,
+//    ISuperAgreement,
+//    BatchOperation
+//} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
+import "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
 import {
     IConstantFlowAgreementV1
@@ -417,6 +419,65 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         for(uint i = 0; i < adr.length; i++) {
             this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i]);
         }
+    }
+
+    function registerBatchCall(address[] calldata adr, int96[] calldata flowRate, bool[] calldata isPermanent, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration) public atLeastGrantor {
+        //TODO: check that lengths match
+        ISuperfluid.Operation[] memory operations = new ISuperfluid.Operation[](adr.length);
+        for(uint i = 0; i < adr.length; i++) {
+            //this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i]);
+            Flow memory newFlow = Flow(adr[i], flowRate[i], isPermanent[i], FlowState.Registered, cliffEnd[i], vestingDuration[i], 0);
+            if (_recipients[newFlow.recipient].length == 0) {
+                recipientAddresses.push(adr[i]);
+            }
+            _recipients[newFlow.recipient].push(newFlow);
+            if ( cliffEnd[i].add(vestingDuration[i]) < nextCloseDate ) {
+                nextCloseDate = cliffEnd[i].add(vestingDuration[i]);
+                nextCloseAddress = adr[i];
+            }
+            uint256 flowIndex = _recipients[newFlow.recipient].length - 1;
+            emit FlowCreated(
+                adr[i], 
+                flowIndex, 
+                newFlow.flowRate, 
+                newFlow.permanent,
+                newFlow.state,
+                newFlow.cliffEnd,
+                newFlow.vestingDuration,
+                newFlow.starttime  
+            );
+            // TODO: the following assumes all in batch are ready to launch - FIX THIS
+            operations[i].operationType = BatchOperation.OPERATION_TYPE_SUPERFLUID_CALL_AGREEMENT;
+            operations[i].target = address(_cfa);
+            operations[i].data = abi.encode(
+                abi.encodeWithSelector(
+                    _cfa.createFlow.selector,
+                    acceptedToken,
+                    adr[i],
+                    flowRate[i],
+                    new bytes(0)
+                ),
+                new bytes(0)
+            );
+            _recipients[newFlow.recipient][flowIndex].state = FlowState.Flowing;
+            newFlow.state = FlowState.Flowing;
+            if (_recipients[newFlow.recipient][flowIndex].starttime == 0) {
+                _recipients[newFlow.recipient][flowIndex].starttime = block.timestamp;
+                newFlow.starttime = block.timestamp;
+            }
+            flowRates[newFlow.recipient] = _recipients[newFlow.recipient][flowIndex].flowRate;
+            emit FlowStarted(
+                adr[i], 
+                flowIndex, 
+                newFlow.flowRate, 
+                newFlow.permanent,
+                newFlow.state,
+                newFlow.cliffEnd,
+                newFlow.vestingDuration,
+                newFlow.starttime
+            );
+        }
+        _host.batchCall(operations);
     }
 
     function closeDate(address recipient, uint256 flowIndex) internal view returns(uint256) {
