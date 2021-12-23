@@ -15,7 +15,7 @@ var BN = web3.utils.BN;
 var showWizard = false;
 
 var factories = {};
-factories.rinkeby =     "0x7C06233Dc74d716ABF0f783E1E4fd56343bACd73"; 
+factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
 factories.polygon = "";
 var factoryAddress = factories[chain];
@@ -540,7 +540,7 @@ $( document ).ready(function() {
             'to': factoryAddress,
             'gasPrice': gas,
             'nonce': "" + nonce,
-            'data': factory.methods.createVestor(superAddress).encodeABI()
+            'data': factory.methods.createVestor(superAddress, addr.SuperHost, addr.cfa).encodeABI()
         };
         const block = web3.eth.getBlockNumber();
         const txHash = await ethereum.request({

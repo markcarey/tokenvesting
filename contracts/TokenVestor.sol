@@ -19,8 +19,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "@openzeppelin/contracts/proxy/Clones.sol";
-
 interface IVestingFactory {
     function addUser(address user) external returns (bool);    
 }
@@ -96,30 +94,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function initialize(
         address _acceptedToken,
-        address owner
+        address owner,
+        address host,
+        address cfa
     ) public virtual initializer {
         require(address(_acceptedToken) != address(0), "acceptedToken is zero address");
         __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
 
-        console.log("chainid", block.chainid);
-        if ( block.chainid == 137 ) {
-            _host = ISuperfluid(0x3E14dC1b13c488a8d5D310918780c983bD5982E7);
-            _cfa = IConstantFlowAgreementV1(0x6EeE6060f715257b970700bc2656De21dEdF074C);
-        }
-        if ( block.chainid == 80001 ) {
-            _host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
-            _cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
-        }
-        if ( block.chainid == 4 || block.chainid == 31337 ) {
-            _host = ISuperfluid(0xeD5B5b32110c3Ded02a07c8b8e97513FAfb883B6);
-            _cfa = IConstantFlowAgreementV1(0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A);
-        }
-
-        // Mumbai: change this!!!
-        //_host = ISuperfluid(0xEB796bdb90fFA0f28255275e16936D25d3418603);
-        //_cfa = IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
-
+        _host = ISuperfluid(host);
+        _cfa = IConstantFlowAgreementV1(cfa);
 
         acceptedToken = ISuperToken(_acceptedToken);
         admin = owner;
@@ -488,54 +472,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             token.approve(address(acceptedToken), amount);
             acceptedToken.upgrade(amount);
         }
-    }
-
-}
-
-
-contract VestingFactory {
-    address immutable tokenImplementation;
-    address owner;
-    address[] public allVestors;
-    mapping(address => address[]) userToVestors;
-    mapping(address => address) ownerOfVestor;
-
-
-    constructor() public {
-        tokenImplementation = address(new TokenVestor());
-        owner = msg.sender;
-    }
-
-    event VestorCreated(
-        address indexed _owner,
-        address _contract,
-        uint
-    );
-
-    function createVestor(address _token) external returns (address) {
-        address clone = Clones.clone(tokenImplementation);
-        TokenVestor(clone).initialize(_token, msg.sender);
-        allVestors.push(clone);
-        userToVestors[msg.sender].push(clone);
-        ownerOfVestor[clone] = msg.sender;
-        emit VestorCreated(msg.sender, clone, allVestors.length);
-        return clone;
-    }
-
-    // should be called only by vestor contract
-    function addUser(address user) external returns (bool) {
-        userToVestors[user].push(msg.sender);
-        return true;
-    }
-
-    // returns array of all TokenVestor contract addresses
-    function getAllVestors() public view returns (address[] memory){
-       return allVestors;
-    }
-
-    // returns array of all Garden contract addresses for a specified user address
-    function getVestorsForUser(address user) public view returns (address[] memory){
-       return userToVestors[user];
     }
 
 }

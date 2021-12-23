@@ -73,6 +73,16 @@ const factoryABI = [
           "internalType": "address",
           "name": "_token",
           "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_host",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_cfa",
+          "type": "address"
         }
       ],
       "name": "createVestor",
@@ -118,7 +128,7 @@ const factoryABI = [
       "stateMutability": "view",
       "type": "function"
     }
-];
+  ];
 
 const vestorABI = [
     {
@@ -749,6 +759,16 @@ const vestorABI = [
         {
           "internalType": "address",
           "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "host",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "cfa",
           "type": "address"
         }
       ],
