@@ -132,6 +132,12 @@ const vestorABI = [
         },
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "flowIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "int96",
           "name": "flowRate",
           "type": "int96"
@@ -139,8 +145,38 @@ const vestorABI = [
         {
           "indexed": false,
           "internalType": "bool",
-          "name": "wasPermanent",
+          "name": "permanent",
           "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum TokenVestor.FlowState",
+          "name": "state",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffEnd",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vestingDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "starttime",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffAmount",
+          "type": "uint256"
         }
       ],
       "name": "FlowCreated",
@@ -157,6 +193,12 @@ const vestorABI = [
         },
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "flowIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "int96",
           "name": "flowRate",
           "type": "int96"
@@ -164,8 +206,99 @@ const vestorABI = [
         {
           "indexed": false,
           "internalType": "bool",
-          "name": "wasPermanent",
+          "name": "permanent",
           "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum TokenVestor.FlowState",
+          "name": "state",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffEnd",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vestingDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "starttime",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FlowStarted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "flowIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int96",
+          "name": "flowRate",
+          "type": "int96"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "permanent",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum TokenVestor.FlowState",
+          "name": "state",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffEnd",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vestingDuration",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "starttime",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffAmount",
+          "type": "uint256"
         }
       ],
       "name": "FlowStopped",
@@ -312,6 +445,24 @@ const vestorABI = [
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "closeReady",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "canExec",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "execPayload",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -338,6 +489,19 @@ const vestorABI = [
         }
       ],
       "name": "closeVesting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "closeVestingForAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -455,6 +619,11 @@ const vestorABI = [
             {
               "internalType": "uint256",
               "name": "starttime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cliffAmount",
               "type": "uint256"
             }
           ],
@@ -602,6 +771,70 @@ const vestorABI = [
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "nextCloseAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextCloseDate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "adr",
+          "type": "address[]"
+        },
+        {
+          "internalType": "int96[]",
+          "name": "flowRate",
+          "type": "int96[]"
+        },
+        {
+          "internalType": "bool[]",
+          "name": "isPermanent",
+          "type": "bool[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "cliffEnd",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "vestingDuration",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "cliffAmount",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "registerBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -626,6 +859,11 @@ const vestorABI = [
         {
           "internalType": "uint256",
           "name": "vestingDuration",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cliffAmount",
           "type": "uint256"
         }
       ],
@@ -666,6 +904,11 @@ const vestorABI = [
             {
               "internalType": "uint256",
               "name": "starttime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cliffAmount",
               "type": "uint256"
             }
           ],
@@ -709,6 +952,24 @@ const vestorABI = [
         }
       ],
       "name": "revokeRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_addr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_closeDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "setNextClose",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

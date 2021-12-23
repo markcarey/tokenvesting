@@ -8,7 +8,7 @@ const factoryJSON = require("../artifacts/contracts/TokenVesting.sol/VestingFact
 const vestorJSON = require("../artifacts/contracts/TokenVesting.sol/TokenVestor.json");
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0x6F85ACFe156343720C27eB1B40aAD94B410D168b";
+const vestorAddress = "0x26B34586297f2e9878847e00529cbbf17d3C7E41";
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2152,7 +2152,7 @@ async function main() {
 
 async function addFlow() {
   //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
-  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1640112967, 60*10);
+  await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1640112967, 60*10, 1);
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
 }
@@ -2171,6 +2171,7 @@ async function addBatch() {
   var perm = [];
   var cliff = [];
   var dur = [];
+  var lump = [];
   var start = 1640112967;
   for (let i = 0; i < 25; i++) {
     start += 0;
@@ -2179,32 +2180,13 @@ async function addBatch() {
     perm[i] = false;
     cliff[i] = start;
     dur[i] = 60*10;
+    lump[i] = 1;
   }
-  await vestor.registerBatch(addr, fr, perm, cliff, dur);
+  await vestor.registerBatch(addr, fr, perm, cliff, dur, lump);
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
 }
 
-async function addBatchCall() {
-  //await vestor.registerFlow(PUBLIC_KEY, 3170979198376, false, 1636215467, 60*60*24*365);
-  var addr = [];
-  var fr = [];
-  var perm = [];
-  var cliff = [];
-  var dur = [];
-  var start = 1640112967;
-  for (let i = 0; i < 25; i++) {
-    start += 0;
-    addr[i] = randomAddress();
-    fr[i] = 123456;
-    perm[i] = false;
-    cliff[i] = start;
-    dur[i] = 60*10;
-  }
-  await vestor.registerBatchCall(addr, fr, perm, cliff, dur);
-  const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
-  console.log("Flows are " + JSON.stringify(flows));
-}
 
 async function grantRole(role, addr) {
   await vestor.grantRole(role, addr);
@@ -2379,8 +2361,8 @@ async function upgrade() {
 
 
  //clone();
- //addFlow()
- addBatch()
+ addFlow()
+ //addBatch()
  //addBatchCall()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
