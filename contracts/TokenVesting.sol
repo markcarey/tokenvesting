@@ -38,6 +38,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         uint256 cliffEnd;
         uint256 vestingDuration;
         uint256 starttime;
+        uint256 cliffAmount;
     }
 
     event FlowStopped(
@@ -48,7 +49,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         FlowState state,
         uint256 cliffEnd,
         uint256 vestingDuration,
-        uint256 starttime
+        uint256 starttime,
+        uint256 cliffAmount
     );
 
     event FlowCreated(
@@ -59,7 +61,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         FlowState state,
         uint256 cliffEnd,
         uint256 vestingDuration,
-        uint256 starttime
+        uint256 starttime,
+        uint256 cliffAmount
     );
 
     event FlowStarted(
@@ -70,7 +73,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         FlowState state,
         uint256 cliffEnd,
         uint256 vestingDuration,
-        uint256 starttime
+        uint256 starttime,
+        uint256 cliffAmount
     );
 
     ISuperfluid _host;
@@ -193,7 +197,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                             _recipients[addr][flowIndex].state,
                             _recipients[addr][flowIndex].cliffEnd,
                             _recipients[addr][flowIndex].vestingDuration,
-                            _recipients[addr][flowIndex].starttime  
+                            _recipients[addr][flowIndex].starttime,
+                            _recipients[addr][flowIndex].cliffAmount  
                         );
                     }
                 }
@@ -203,6 +208,11 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function createOrUpdateStream(address recipient, uint256 flowIndex) internal {
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
+        require(_recipients[recipient][flowIndex].starttime == 0, "!already started");
+        if ( _recipients[recipient][flowIndex].cliffAmount > 0 ) {
+            // send cliff lump sum
+            acceptedToken.transfer(recipient, _recipients[recipient][flowIndex].cliffAmount);
+        }
         if (outFlowRate == 0) {
             if (recipient != address(this)) {
                 openStream(recipient, flowIndex);
@@ -361,7 +371,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             _recipients[recipient][flowIndex].state,
             _recipients[recipient][flowIndex].cliffEnd,
             _recipients[recipient][flowIndex].vestingDuration,
-            _recipients[recipient][flowIndex].starttime  
+            _recipients[recipient][flowIndex].starttime,
+            _recipients[recipient][flowIndex].cliffAmount  
         );
     }
 
@@ -374,9 +385,9 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         return recipientAddresses;
     }
 
-    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration) public atLeastGrantor returns (Flow memory) {
+    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration, uint256 cliffAmount) public atLeastGrantor returns (Flow memory) {
         require(flowRate > 0, "flowRate <= 0");
-        Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0);
+        Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0, cliffAmount);
         if (_recipients[adr].length == 0) {
             recipientAddresses.push(adr);
         }
@@ -394,7 +405,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.state,
             newFlow.cliffEnd,
             newFlow.vestingDuration,
-            newFlow.starttime  
+            newFlow.starttime,
+            newFlow.cliffAmount
         );
         if (block.timestamp > newFlow.cliffEnd) {
             createOrUpdateStream(adr, flowIndex);
@@ -406,16 +418,17 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 newFlow.state,
                 newFlow.cliffEnd,
                 newFlow.vestingDuration,
-                newFlow.starttime  
+                newFlow.starttime,
+                newFlow.cliffAmount  
             );
         }
         return newFlow;
     }
 
-    function registerBatch(address[] calldata adr, int96[] calldata flowRate, bool[] calldata isPermanent, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration) public atLeastGrantor {
+    function registerBatch(address[] calldata adr, int96[] calldata flowRate, bool[] calldata isPermanent, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount) public atLeastGrantor {
         //TODO: check that lengths match
         for(uint i = 0; i < adr.length; i++) {
-            this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i]);
+            this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i], cliffAmount[i]);
         }
     }
 
