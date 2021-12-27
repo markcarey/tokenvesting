@@ -37,6 +37,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         uint256 vestingDuration;
         uint256 starttime;
         uint256 cliffAmount;
+        bytes32 ref;
     }
 
     event FlowStopped(
@@ -48,7 +49,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         uint256 cliffEnd,
         uint256 vestingDuration,
         uint256 starttime,
-        uint256 cliffAmount
+        uint256 cliffAmount,
+        bytes32 ref
     );
 
     event FlowCreated(
@@ -60,7 +62,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         uint256 cliffEnd,
         uint256 vestingDuration,
         uint256 starttime,
-        uint256 cliffAmount
+        uint256 cliffAmount,
+        bytes32 ref
     );
 
     event FlowStarted(
@@ -72,7 +75,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         uint256 cliffEnd,
         uint256 vestingDuration,
         uint256 starttime,
-        uint256 cliffAmount
+        uint256 cliffAmount,
+        bytes32 ref
     );
 
     ISuperfluid _host;
@@ -182,7 +186,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                             _recipients[addr][flowIndex].cliffEnd,
                             _recipients[addr][flowIndex].vestingDuration,
                             _recipients[addr][flowIndex].starttime,
-                            _recipients[addr][flowIndex].cliffAmount  
+                            _recipients[addr][flowIndex].cliffAmount,
+                            _recipients[addr][flowIndex].ref  
                         );
                     }
                 }
@@ -356,8 +361,41 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             _recipients[recipient][flowIndex].cliffEnd,
             _recipients[recipient][flowIndex].vestingDuration,
             _recipients[recipient][flowIndex].starttime,
-            _recipients[recipient][flowIndex].cliffAmount  
+            _recipients[recipient][flowIndex].cliffAmount,
+            _recipients[recipient][flowIndex].ref
         );
+    }
+
+    function redirectStreams(address oldRecipient, address newRecipient, bytes32 ref) external onlyManager {
+        Flow[] memory flows = _recipients[oldRecipient];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            console.log("starting on flowIndex", flowIndex);
+            if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
+                console.log("passed ref check");
+                if ( flows[flowIndex].state != FlowState.Stopped) {
+                    console.log("state is not stopped");
+                    uint256 newVestingDuration = flows[flowIndex].vestingDuration;
+                    uint256 newCliffAmount = flows[flowIndex].cliffAmount;
+                    uint256 newCliffEnd = flows[flowIndex].cliffEnd;
+                    if ( flows[flowIndex].state == FlowState.Flowing) {
+                        console.log("state is Flowing");
+                        _closeStream(oldRecipient, flowIndex);
+                        console.log("after _closeStream");
+                        newCliffEnd = block.timestamp - 1;
+                        newCliffAmount = 0;
+                        newVestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
+                        console.log("newVestingDuration", newVestingDuration);
+                    } else {
+                        _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
+                    }
+                    //this.registerFlow(newRecipient, flows[flowIndex].flowRate, false, newCliffEnd, newVestingDuration, newCliffAmount);
+                    Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, newCliffEnd, newVestingDuration, 0, newCliffAmount, flows[flowIndex].ref);
+                    console.log("b4 _registerFlow");
+                    _registerFlow(newFlow);
+                    console.log("after _registerFlow");
+                }
+            }
+        }
     }
 
     // now this returns an array of {Flow}s
@@ -369,20 +407,45 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         return recipientAddresses;
     }
 
-    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration, uint256 cliffAmount) public atLeastGrantor returns (Flow memory) {
+
+    function registerFlow(address adr, int96 flowRate, bool isPermanent, uint256 cliffEnd, uint256 vestingDuration, uint256 cliffAmount, bytes32 ref) public atLeastGrantor returns (Flow memory) {
         require(flowRate > 0, "flowRate <= 0");
-        Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0, cliffAmount);
-        if (_recipients[adr].length == 0) {
-            recipientAddresses.push(adr);
+        Flow memory newFlow = Flow(adr, flowRate, isPermanent, FlowState.Registered, cliffEnd, vestingDuration, 0, cliffAmount, ref);
+        return _registerFlow(newFlow);
+    }
+
+    function registerBatch(address[] calldata adr, int96[] calldata flowRate, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount, bytes32[] calldata ref) public atLeastGrantor {
+        //TODO: check that lengths match
+        for(uint i = 0; i < adr.length; i++) {
+            Flow memory newFlow = Flow(adr[i], flowRate[i], false, FlowState.Registered, cliffEnd[i], vestingDuration[i], 0, cliffAmount[i], ref[i]);
+            _registerFlow(newFlow);
         }
-        _recipients[adr].push(newFlow);
-        if ( cliffEnd.add(vestingDuration) < nextCloseDate ) {
-            nextCloseDate = cliffEnd.add(vestingDuration);
-            nextCloseAddress = adr;
+    }
+
+    function registerBatchPermanent(address[] calldata adr, int96[] calldata flowRate, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount, bytes32[] calldata ref) public atLeastGrantor {
+        //TODO: check that lengths match
+        for(uint i = 0; i < adr.length; i++) {
+            Flow memory newFlow = Flow(adr[i], flowRate[i], true, FlowState.Registered, cliffEnd[i], vestingDuration[i], 0, cliffAmount[i], ref[i]);
+            _registerFlow(newFlow);
         }
-        uint256 flowIndex = _recipients[adr].length - 1;
+    }
+
+    function addRef(address adr, uint256 flowIndex, bytes32 ref) external atLeastGrantor {
+        _recipients[adr][flowIndex].ref = ref;
+    }
+
+    function _registerFlow(Flow memory newFlow) internal returns (Flow memory) {
+        if (_recipients[newFlow.recipient].length == 0) {
+            recipientAddresses.push(newFlow.recipient);
+        }
+        _recipients[newFlow.recipient].push(newFlow);
+        if ( newFlow.cliffEnd.add(newFlow.vestingDuration) < nextCloseDate ) {
+            nextCloseDate = newFlow.cliffEnd.add(newFlow.vestingDuration);
+            nextCloseAddress = newFlow.recipient;
+        }
+        uint256 flowIndex = _recipients[newFlow.recipient].length - 1;
         emit FlowCreated(
-            adr, 
+            newFlow.recipient, 
             flowIndex, 
             newFlow.flowRate, 
             newFlow.permanent,
@@ -390,12 +453,13 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.cliffEnd,
             newFlow.vestingDuration,
             newFlow.starttime,
-            newFlow.cliffAmount
+            newFlow.cliffAmount,
+            newFlow.ref
         );
         if (block.timestamp > newFlow.cliffEnd) {
-            createOrUpdateStream(adr, flowIndex);
+            createOrUpdateStream(newFlow.recipient, flowIndex);
             emit FlowStarted(
-                adr, 
+                newFlow.recipient, 
                 flowIndex, 
                 newFlow.flowRate, 
                 newFlow.permanent,
@@ -403,17 +467,11 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 newFlow.cliffEnd,
                 newFlow.vestingDuration,
                 newFlow.starttime,
-                newFlow.cliffAmount  
+                newFlow.cliffAmount,
+                newFlow.ref  
             );
         }
         return newFlow;
-    }
-
-    function registerBatch(address[] calldata adr, int96[] calldata flowRate, bool[] calldata isPermanent, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount) public atLeastGrantor {
-        //TODO: check that lengths match
-        for(uint i = 0; i < adr.length; i++) {
-            this.registerFlow(adr[i], flowRate[i], isPermanent[i], cliffEnd[i], vestingDuration[i], cliffAmount[i]);
-        }
     }
 
     function closeDate(address recipient, uint256 flowIndex) internal view returns(uint256) {
@@ -452,6 +510,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function flowTokenBalance() public view returns (uint256) {
         return acceptedToken.balanceOf(address(this));
+    }
+
+    function getNetFlow() public view returns (int96) {
+       return _cfa.getNetFlow(acceptedToken, address(this));
     }
 
     function withdraw(IERC20 token, uint256 amount) public onlyManager {

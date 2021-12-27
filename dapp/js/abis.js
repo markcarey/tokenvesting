@@ -187,6 +187,12 @@ const vestorABI = [
           "internalType": "uint256",
           "name": "cliffAmount",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
         }
       ],
       "name": "FlowCreated",
@@ -248,6 +254,12 @@ const vestorABI = [
           "internalType": "uint256",
           "name": "cliffAmount",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
         }
       ],
       "name": "FlowStarted",
@@ -309,6 +321,12 @@ const vestorABI = [
           "internalType": "uint256",
           "name": "cliffAmount",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
         }
       ],
       "name": "FlowStopped",
@@ -452,6 +470,29 @@ const vestorABI = [
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "adr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "flowIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        }
+      ],
+      "name": "addRef",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -635,11 +676,29 @@ const vestorABI = [
               "internalType": "uint256",
               "name": "cliffAmount",
               "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "ref",
+              "type": "bytes32"
             }
           ],
           "internalType": "struct TokenVestor.Flow[]",
           "name": "",
           "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNetFlow",
+      "outputs": [
+        {
+          "internalType": "int96",
+          "name": "",
+          "type": "int96"
         }
       ],
       "stateMutability": "view",
@@ -819,6 +878,29 @@ const vestorABI = [
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "oldRecipient",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "newRecipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        }
+      ],
+      "name": "redirectStreams",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address[]",
           "name": "adr",
           "type": "address[]"
@@ -827,11 +909,6 @@ const vestorABI = [
           "internalType": "int96[]",
           "name": "flowRate",
           "type": "int96[]"
-        },
-        {
-          "internalType": "bool[]",
-          "name": "isPermanent",
-          "type": "bool[]"
         },
         {
           "internalType": "uint256[]",
@@ -847,9 +924,52 @@ const vestorABI = [
           "internalType": "uint256[]",
           "name": "cliffAmount",
           "type": "uint256[]"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "ref",
+          "type": "bytes32[]"
         }
       ],
       "name": "registerBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "adr",
+          "type": "address[]"
+        },
+        {
+          "internalType": "int96[]",
+          "name": "flowRate",
+          "type": "int96[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "cliffEnd",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "vestingDuration",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "cliffAmount",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "ref",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "registerBatchPermanent",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -885,6 +1005,11 @@ const vestorABI = [
           "internalType": "uint256",
           "name": "cliffAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
         }
       ],
       "name": "registerFlow",
@@ -930,6 +1055,11 @@ const vestorABI = [
               "internalType": "uint256",
               "name": "cliffAmount",
               "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "ref",
+              "type": "bytes32"
             }
           ],
           "internalType": "struct TokenVestor.Flow",

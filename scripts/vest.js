@@ -6,9 +6,10 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 const factoryJSON = require("../artifacts/contracts/VestingFactory.sol/VestingFactory.json");
 const vestorJSON = require("../artifacts/contracts/TokenVestor.sol/TokenVestor.json");
+const { setUncaughtExceptionCaptureCallback } = require('process');
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0x26B34586297f2e9878847e00529cbbf17d3C7E41";
+const vestorAddress = "0xb589E9aADaD54C2e48F6e6808BC14858561e4ac1"; // mumbai with redirect
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2172,19 +2173,28 @@ async function addBatch() {
   var cliff = [];
   var dur = [];
   var lump = [];
-  var start = 1640112967;
-  for (let i = 0; i < 25; i++) {
+  var ref = [];
+  var start = 1640624994;
+  for (let i = 0; i < 10; i++) {
     start += 0;
-    addr[i] = randomAddress();
+    //addr[i] = randomAddress();
+    addr[i] = PUBLIC_KEY;
     fr[i] = 123456;
     perm[i] = false;
     cliff[i] = start;
     dur[i] = 60*10;
     lump[i] = 1;
+    ref[i] = ethers.utils.id(PUBLIC_KEY + "salt4");
   }
-  await vestor.registerBatch(addr, fr, perm, cliff, dur, lump);
+  await vestor.registerBatch(addr, fr, cliff, dur, lump, ref); // assumes permanent == false
   const flows = await vestor.getFlowRecipient(PUBLIC_KEY);
   console.log("Flows are " + JSON.stringify(flows));
+}
+
+async function redirect() {
+  const ref = ethers.utils.id(PUBLIC_KEY + "salt4");
+  await vestor.redirectStreams(PUBLIC_KEY, "0x604e4F5ebf807Ed32d99d98be926c54854B1518C", ref);
+  console.log("redirected");
 }
 
 
@@ -2358,11 +2368,18 @@ async function upgrade() {
   await superToken.upgrade('10000000000000000000000');
 }
 
+async function setNonce(nonce) {
+  await hre.network.provider.send("hardhat_setNonce", [
+    PUBLIC_KEY,
+    ethers.utils.hexlify(nonce)
+  ]);
+}
 
-
+ //setNonce(56)
  //clone();
- addFlow()
+ //addFlow()
  //addBatch()
+ redirect()
  //addBatchCall()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
@@ -2379,7 +2396,7 @@ async function upgrade() {
  //grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
  //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
- //getSome(addr.fDAI, "0x5a9e792143bf2708b4765c144451dca54f559a19")
+ //getSome(addr.fDAI, "0xae1c976a25c6d0dccb5f1a7a9cdf81e518b27942")
  //getSome(addr.fDAIx, "0xac7605770e89ef96f68a081815b2fb8d59532896")
  //upgrade()
 

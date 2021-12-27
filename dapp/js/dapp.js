@@ -1,11 +1,11 @@
-var chain = "rinkeby";
+var chain = "mumbai";
 
 var rpcURLs = {};
 rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57";
 rpcURLs.mumbai = "polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 rpcURLs.polygon = "polygon-mainnet.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 
-//rpcURLs.rinkeby = "localhost:8545";  // CHANGE THIS!!!!!!
+//rpcURLs.mumbai = "localhost:8545";  // CHANGE THIS!!!!!!
 var rpcURL = rpcURLs[chain];
 
 var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
@@ -16,7 +16,7 @@ var showWizard = false;
 
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
-factories.mumbai =      "0xF91C2a88086AcbE2b0dcaFDb9CeCf108Ea1D00bF";
+factories.mumbai =      "0xA111617bdC69ED129b2c7041e42d7E1D6C694fD7"; 
 factories.polygon = "";
 var factoryAddress = factories[chain];
 
@@ -65,13 +65,15 @@ if (chain == "mumbai") {
     addr.WETH = "0x3C68CE8504087f89c640D02d133646d98e64ddd9";
     addr.DAI = "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F";
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
+    addr.fDAI = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
+    addr.fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
 }
 if (chain == "polygon") {
     //Polygon
     addr.Resolver = "0xE0cc76334405EE8b39213E620587d815967af39C";
     addr.SuperTokenFactory = "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34";
     addr.SuperHost = "0x3E14dC1b13c488a8d5D310918780c983bD5982E7";
-    addr.cfa = ""; // TODO: fill this in
+    addr.cfa = "0x6EeE6060f715257b970700bc2656De21dEdF074C";
     addr.WETH = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
     addr.DAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
     addr.USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
@@ -266,20 +268,9 @@ function flowToObject(f) {
         "recipient": f.recipient,
         "starttime": f.starttime,
         "state": f.state,
-        "vestingDuration": f.vestingDuration
+        "vestingDuration": f.vestingDuration,
+        "ref": f.ref
     };
-    return flow;
-}
-
-function flowToArray(f) {
-    var flow = [
-        f.recipient,
-        f.flowRate,
-        f.cliffEnd,
-        f.vestingDuration,
-        f.permanent,
-        f.state
-    ];
     return flow;
 }
 
@@ -707,7 +698,7 @@ $( document ).ready(function() {
             'to': vestorAddress,
             'gasPrice': gas,
             'nonce': "" + nonce,
-            'data': vestor.methods.registerFlow(flowAddress, flowRate, permanent, start.unix(), duration, 0).encodeABI()
+            'data': vestor.methods.registerFlow(flowAddress, flowRate, permanent, start.unix(), duration, 0, "0x").encodeABI()
         };
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
