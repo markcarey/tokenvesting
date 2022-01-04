@@ -2,6 +2,9 @@ cache/
 artifacts/
 .DS_STORE
 
+# docs
+_build
+
 # Logs
 logs
 *.log
