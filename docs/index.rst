@@ -32,8 +32,9 @@ admonition finished..
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Options:
+   :caption: Overview:
 
+   Options/superfluid
    Options/justlogic
    Options/justcode
    Options/justhardware
