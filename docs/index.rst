@@ -3,47 +3,73 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Token Vesting's documentation!
-=========================================
+|TokenVesting Logo| Welcome to TokenVesting
+===========================================
 
-Lorem *ipsum* dolor sit amet, **consectetur** adipiscing elit. ``Donec`` euismod, nisl eu
-sodales consectetur, :doc:`best starting poing </Options/justcode>` nisi nisi consectetur nisl, euismod aliquam nisl eros eu
-urna. Nulla facilisi. :doc:`/Options/justlogic` Nulla facilisi.
+ .. |TokenVesting Logo| image:: images/stream.svg
+   :width: 40
+   :alt: TokenVesting Logo
 
-* list item one
-   * indented list item one
-* list item two
-* list itme three
-* list item four
 
-.. caution:: 
-   danger tip note - col9ours
-   Lorem *ipsum* dolor sit amet, **consectetur** adipiscing elit. ``Donec`` euismod, nisl eu
-   sodales consectetur, nisi nisi consectetur nisl, euismod aliquam nisl eros eu
-   urna. Nulla facilisi. Nulla facilisi. :ref:`Click here for a targeted link <hwcodeOptions>`
+Stream tokens to your favorite community with the superfluid protocol.
 
-admonition finished..
+What is TokenVesting.finance?
+-----------------------------
 
-#. list item one
-#. list item two
-#. list itme three
-#. list item four
+The `TokenVesting.finance <https://tokenvesting.finance/>`_ app streams tokens directly to 
+team members, contributors or even as rewards to community members using the :doc:`superfluid protocol </Glossary/superfluid>`.
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Overview:
+What is token vesting?
+----------------------
 
-   Options/superfluid
-   Options/justlogic
-   Options/justcode
-   Options/justhardware
-   Options/hardwareandcode
+Startups that use the blockchain technology might lock a certain amount of tokens: the 
+team can reserve a certain percentage of coins, which will be gradually released once a 
+month/quarter/year during the project process for financial purposes. In general terms, 
+the **process of releasing these coins** is called vesting. 
+
+
+What are the benefits of Token Vesting?
+---------------------------------------
+
+Vesting is usually used to show that the team is **highly interested** in the project, and will 
+continue working on project development. Additionally, vesting lowers market price 
+manipulations. It also helps to **maintain a stable long-term value** of a particular 
+(digital) asset.
 
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Guidelines:
+   :caption: Welcome:
+   
+   Welcome/features
+   
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Getting Started:
 
-   Guidelines/content
-   Guidelines/workflow
+   GettingStarted/workflow
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: RoadMap:   
+
+   RoadMap/roadmap
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: FAQ:
+
+   FAQ/faq
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Glossary:
+
+   Glossary/terminology
+   Glossary/superfluid
+
+
