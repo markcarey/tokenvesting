@@ -1,15 +1,15 @@
-var chain = "mumbai";
+var chain = "polygon";
 
 var rpcURLs = {};
 rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57";
 rpcURLs.mumbai = "polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 rpcURLs.polygon = "polygon-mainnet.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 
-//rpcURLs.mumbai = "localhost:8545";  // CHANGE THIS!!!!!!
+rpcURLs.polygon = "localhost:8545";  // CHANGE THIS!!!!!!
 var rpcURL = rpcURLs[chain];
 
-var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
-//var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
+//var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
+var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 var showWizard = false;
@@ -17,7 +17,7 @@ var showWizard = false;
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xA111617bdC69ED129b2c7041e42d7E1D6C694fD7"; 
-factories.polygon = "";
+factories.polygon =     "0x86b78Fd33814F89f77e5c3D3c540Bf8E13123034"; // localhost
 var factoryAddress = factories[chain];
 
 var vestorAddress = "";
@@ -34,8 +34,8 @@ var roles = {
     CLOSER: web3.utils.keccak256("CLOSER_ROLE")
 };
 
-const prov = {"url": "https://" + rpcURL};
-//const prov = {"url": "http://" + rpcURL};       // localhost only
+//const prov = {"url": "https://" + rpcURL};
+const prov = {"url": "http://" + rpcURL};       // localhost only
 var provider = new ethers.providers.JsonRpcProvider(prov);
 
 var recipientAdresses = [];
@@ -83,6 +83,10 @@ if (chain == "polygon") {
     addr.WBTC = "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6";
     addr.WBTCx = "0x4086eBf75233e8492F1BCDa41C7f2A8288c2fB92";
     addr.DAIx = "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2";
+    addr.idleWETH = "0xfdA25D931258Df948ffecb66b5518299Df6527C4";
+    addr.idleWETHYield = addr.idleWETH;
+    addr.idleWETHx = "0xEB5748f9798B11aF79F892F344F585E3a88aA784";
+    addr.idleWETHYieldx = addr.idleWETHx;
 }
 if ( chain == "rinkeby" ) {
     // Rinkeby
@@ -454,7 +458,11 @@ $( document ).ready(function() {
                 var resolved = await resolver.methods.get("supertokens.v1." + symbol + "x").call();
                 console.log(resolved);
                 if ( resolved == "0x0000000000000000000000000000000000000000" || resolved == "0xc64a23013768e0be8751fd6a2381624194edb6a6" ) {
-                    wrapIt = true;
+                    if ( symbol + 'x' in addr ) {
+                        superAddress = addr[symbol + 'x'];
+                    } else {
+                        wrapIt = true;
+                    }
                 } else {
                     superAddress = resolved;
                 }

@@ -331,12 +331,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function _closeStream(address recipient, uint256 flowIndex) internal {
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
+        //console.log("outFlowRate, flowRate for this flow");
+        //console.logInt(outFlowRate);
+        //console.logInt(_recipients[recipient][flowIndex].flowRate);
         if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
             // decrease the outflow by flowRate
+            //console.log("there is more than one flow, so update it");
             updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
             flowRates[recipient] = outFlowRate - _recipients[recipient][flowIndex].flowRate;
         } else {
-
+            //console.log("only flow, so delete it");
             _host.callAgreement(
                 _cfa,
                 abi.encodeWithSelector(
@@ -367,32 +371,33 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function redirectStreams(address oldRecipient, address newRecipient, bytes32 ref) external onlyManager {
+        //console.log("start redirectStreams: from, to, ref:->", oldRecipient, newRecipient);
+        //console.logBytes32(ref);
         Flow[] memory flows = _recipients[oldRecipient];
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            console.log("starting on flowIndex", flowIndex);
+            //console.log("starting on flowIndex", flowIndex);
             if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
-                console.log("passed ref check");
+                //console.log("passed ref check");
                 if ( flows[flowIndex].state != FlowState.Stopped) {
-                    console.log("state is not stopped");
+                    //console.log("state is not stopped");
                     uint256 newVestingDuration = flows[flowIndex].vestingDuration;
                     uint256 newCliffAmount = flows[flowIndex].cliffAmount;
                     uint256 newCliffEnd = flows[flowIndex].cliffEnd;
                     if ( flows[flowIndex].state == FlowState.Flowing) {
-                        console.log("state is Flowing");
+                        //console.log("state is Flowing, ready to close");
                         _closeStream(oldRecipient, flowIndex);
-                        console.log("after _closeStream");
+                        //console.log("after _closeStream");
                         newCliffEnd = block.timestamp - 1;
                         newCliffAmount = 0;
                         newVestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
-                        console.log("newVestingDuration", newVestingDuration);
+                        //console.log("newVestingDuration", newVestingDuration);
                     } else {
                         _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
                     }
-                    //this.registerFlow(newRecipient, flows[flowIndex].flowRate, false, newCliffEnd, newVestingDuration, newCliffAmount);
                     Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, newCliffEnd, newVestingDuration, 0, newCliffAmount, flows[flowIndex].ref);
-                    console.log("b4 _registerFlow");
+                    //console.log("b4 _registerFlow");
                     _registerFlow(newFlow);
-                    console.log("after _registerFlow");
+                    //console.log("after _registerFlow");
                 }
             }
         }

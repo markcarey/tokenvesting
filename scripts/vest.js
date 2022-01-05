@@ -9,7 +9,7 @@ const vestorJSON = require("../artifacts/contracts/TokenVestor.sol/TokenVestor.j
 const { setUncaughtExceptionCaptureCallback } = require('process');
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0xb589E9aADaD54C2e48F6e6808BC14858561e4ac1"; // mumbai with redirect
+const vestorAddress = "0x8f678d16918bc16F9EB23259a8A7D4c2Baa26B4e"; // loclahost:polygon
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2051,7 +2051,7 @@ const cfaABI = [{
 
 
 var addr = {};
-var chain = "rinkeby";
+var chain = "polygon";
 if (chain == "mumbai") {
   //Mumbai:
   addr.router = "";
@@ -2068,7 +2068,7 @@ if (chain == "polygon") {
   addr.Resolver = "0xE0cc76334405EE8b39213E620587d815967af39C";
   addr.SuperTokenFactory = "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34";
   addr.SuperHost = "0x3E14dC1b13c488a8d5D310918780c983bD5982E7";
-  addr.cfa = ""; // TODO: fill this in
+  addr.cfa = "0x6EeE6060f715257b970700bc2656De21dEdF074C";
   addr.WETH = "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619";
   addr.DAI = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
   addr.USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
@@ -2078,6 +2078,10 @@ if (chain == "polygon") {
   addr.WBTC = "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6";
   addr.WBTCx = "0x4086eBf75233e8492F1BCDa41C7f2A8288c2fB92";
   addr.DAIx = "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2";
+  addr.idleWETH = "0xfdA25D931258Df948ffecb66b5518299Df6527C4";
+  addr.idleWETHYield = addr.idleWETH;
+  addr.idleWETHx = "0xEB5748f9798B11aF79F892F344F585E3a88aA784";
+  addr.idleWETHYieldx = addr.idleWETHx;
 }
 if (chain == "kovan") {
   //Kovan
@@ -2192,8 +2196,11 @@ async function addBatch() {
 }
 
 async function redirect() {
-  const ref = ethers.utils.id(PUBLIC_KEY + "salt4");
-  await vestor.redirectStreams(PUBLIC_KEY, "0x604e4F5ebf807Ed32d99d98be926c54854B1518C", ref);
+  //const ref = ethers.utils.id(PUBLIC_KEY + "salt4");
+  //await vestor.redirectStreams(PUBLIC_KEY, "0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D", ref);
+  var ref = ethers.utils.id("0x22d4B66bEBd2059756D107CaB261d84836D9B3BC" + 4);
+  ref = "0x79bc23a83ad8ce0dff0b1f046dbc6b51341a6b780772d872f128f7a3a0bf4955";
+  await vestor.redirectStreams("0xfa083dfd09f3a7380f6df6e25dd277e2780de41d", "0xcb49713a2f0f509f559f3552692642c282db397f", ref);
   console.log("redirected");
 }
 
@@ -2225,6 +2232,11 @@ async function estimateTotalTokens(addr) {
 
 async function estimateRemainingTokens(addr) {
   const totals = await vestor.estimateRemainingTokens(addr);
+  console.log(totals);
+}
+
+async function getNetFlow() {
+  const totals = await vestor.getNetFlow();
   console.log(totals);
 }
 
@@ -2304,12 +2316,23 @@ async function underlying(addr) {
 async function vestorFlow(){
   const sToken = await vestor.acceptedToken();
   var cfa = new ethers.Contract(
-    cfaAddress,
+    addr.cfa,
     cfaABI,
     signer
   );
   var flow = await cfa.getNetFlow(sToken, vestorAddress);
   console.log("Total flow from vestor is " + flow);
+}
+
+async function getFlow(){
+  const sToken = await vestor.acceptedToken();
+  var cfa = new ethers.Contract(
+    addr.cfa,
+    cfaABI,
+    signer
+  );
+  var flow = await cfa.getFlow(sToken, vestorAddress, "0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D");
+  console.log("Total flow from vestor to 0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D is " + flow);
 }
 
 async function transaction(hash) {
@@ -2390,15 +2413,18 @@ async function setNonce(nonce) {
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
  //transaction("0x980ceb39834a3c7f9714df42d7b979c26fceea7299f678b85f5cf49f3a660a8c")
  //getBlock("0x1427066")
- //setTimestamp(1636612782)
+ //setTimestamp(1641308985)
  //flowTokenBalance()
- //vestorFlow(sToken)
+ //vestorFlow()
+ //getFlow()
  //grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
  //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //getSome(addr.fDAI, "0xae1c976a25c6d0dccb5f1a7a9cdf81e518b27942")
  //getSome(addr.fDAIx, "0xac7605770e89ef96f68a081815b2fb8d59532896")
+//getSome(addr.WETH, "0x5c5a4ae893c4232a050b01a84e193e107dd80ca2")
  //upgrade()
+ //getNetFlow()
 
  //mintSomeWETH()
    .then(() => process.exit(0))
