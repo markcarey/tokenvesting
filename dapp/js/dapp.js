@@ -968,19 +968,19 @@ function flowsByDate(flows) {
         var dayStart = start.unix();
         var end = moment(start).endOf('day');
         var dayEnd = end.unix();
-        console.log("dayStart,dayEnd", dayStart,dayEnd);
+        //console.log("dayStart,dayEnd", dayStart,dayEnd);
         $.each(flows, function( i, flow ) {
             //check for new flows on this day
             var flowStart = parseInt(flow.cliffEnd);
             var flowEnd = flowStart + parseInt(flow.vestingDuration);
-            console.log("flowStart,flowEnd", flowStart,flowEnd);
+            //console.log("flowStart,flowEnd", flowStart,flowEnd);
             if ( (flowStart >= dayStart) && (flowStart <= dayEnd) ) {
-                console.log("starting on this day");
+                //console.log("starting on this day");
                 perDay += flowPerDay(flow.flowRate);
             }
             //check for ending flows
             if ( (flowEnd >= dayStart) && (flowEnd <= dayEnd) ) {
-                console.log("ending on this day");
+                //console.log("ending on this day");
                 perDay -= flowPerDay(flow.flowRate);
             }
         });
@@ -1002,9 +1002,9 @@ function flowsByDate(flows) {
     if (bal > 0) {
         daysLeft = days + "+";
     }
-    console.log(balances);
-    console.log(flowRates);
-    console.log(dates);
+    //console.log(balances);
+    //console.log(flowRates);
+    //console.log(dates);
     chart.balances = balances;
     chart.flowRates = flowRates;
     chart.dates = dates;
