@@ -2,6 +2,9 @@ cache/
 artifacts/
 .DS_STORE
 
+# Docs - https://tokenvesting.readthedocs.io/
+_build
+
 # Logs
 logs
 *.log
