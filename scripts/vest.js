@@ -2082,6 +2082,7 @@ if (chain == "polygon") {
   addr.idleWETHYield = addr.idleWETH;
   addr.idleWETHx = "0xEB5748f9798B11aF79F892F344F585E3a88aA784";
   addr.idleWETHYieldx = addr.idleWETHx;
+  addr.IDLE = "0xC25351811983818c9Fe6D8c580531819c8ADe90f";
 }
 if (chain == "kovan") {
   //Kovan
@@ -2391,6 +2392,20 @@ async function upgrade() {
   await superToken.upgrade('10000000000000000000000');
 }
 
+async function withdrawAll() {
+  let superToken = new ethers.Contract(
+    addr.idleWETHx,
+    superABI,
+    signer
+  );
+  var bal = await superToken.balanceOf(vestorAddress);
+  console.log("bal", bal);
+  var tx = await vestor.withdraw(addr.idleWETHx, bal);
+  await tx.wait();
+  bal = await superToken.balanceOf(vestorAddress);
+  console.log("bal", bal);
+}
+
 async function setNonce(nonce) {
   await hre.network.provider.send("hardhat_setNonce", [
     PUBLIC_KEY,
@@ -2398,11 +2413,22 @@ async function setNonce(nonce) {
   ]);
 }
 
+async function balanceOf(token, addr) {
+  let contract = new ethers.Contract(
+    token,
+    ERC20abi,
+    signer
+  );
+  var bal = await contract.balanceOf(addr);
+  console.log("Bal: " + bal);
+}
+
  //setNonce(56)
  //clone();
  //addFlow()
  //addBatch()
- redirect()
+ //redirect()
+ //ithdrawAll()
  //addBatchCall()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
@@ -2425,7 +2451,11 @@ async function setNonce(nonce) {
 //getSome(addr.WETH, "0x5c5a4ae893c4232a050b01a84e193e107dd80ca2")
  //upgrade()
  //getNetFlow()
-
+ //balanceOf(addr.IDLE, "0x1e646cc354B3e94080892307b516dBfF09F4f39A")
+ // 
+ //balanceOf(addr.WETH, "0xe124a44E9C13F07be177f78ACb5180C005E5FD2F")
+ //balanceOf("0x61ADDCd8F9CCf5a978CF09c76E77073Ae37F9563", "0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
+ balanceOf(addr.idleWETH, "0x369e06C46790d7174Bd96Da75Db5c2977647Ce11")
  //mintSomeWETH()
    .then(() => process.exit(0))
    .catch(error => {

@@ -87,6 +87,7 @@ if (chain == "polygon") {
     addr.idleWETHYield = addr.idleWETH;
     addr.idleWETHx = "0xEB5748f9798B11aF79F892F344F585E3a88aA784";
     addr.idleWETHYieldx = addr.idleWETHx;
+    addr.IDLE = "0xC25351811983818c9Fe6D8c580531819c8ADe90f";
 }
 if ( chain == "rinkeby" ) {
     // Rinkeby
