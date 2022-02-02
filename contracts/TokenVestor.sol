@@ -14,6 +14,10 @@ import {
     IConstantFlowAgreementV1
 } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
 
+import {
+    CFAv1Library
+} from "./superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
@@ -25,6 +29,7 @@ interface IVestingFactory {
 
 contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     using SafeMath for uint256;
+    using CFAv1Library for CFAv1Library.InitData;
 
     enum FlowState { Registered, Flowing, Stopped }
     
@@ -81,6 +86,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     ISuperfluid _host;
     IConstantFlowAgreementV1 _cfa;
+    CFAv1Library.InitData public cfaV1;
     ISuperToken public acceptedToken;
    
     address[] recipientAddresses;
@@ -108,6 +114,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
         _host = ISuperfluid(host);
         _cfa = IConstantFlowAgreementV1(cfa);
+        cfaV1 = CFAv1Library.InitData(_host, IConstantFlowAgreementV1(address(_host.getAgreementClass(keccak256("org.superfluid-finance.agreements.ConstantFlowAgreement.v1")))));
 
         acceptedToken = ISuperToken(_acceptedToken);
         admin = owner;
@@ -165,97 +172,61 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         super.grantRole(role, account);
     }
 
-    function launchVesting(address[] calldata recipientAddresses) public onlyManager {
+    function launchVesting(address[] calldata targetAddresses) public onlyManager {
         console.log("start launchVesting");
-        for(uint i = 0; i < recipientAddresses.length; i++) {
-            address addr = recipientAddresses[i];
+        for(uint i = 0; i < targetAddresses.length; i++) {
+            address addr = targetAddresses[i];
             console.log("starting on address ", addr);
-            Flow[] memory flows = _recipients[addr];
-            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-                console.log("starting on flow with flowIndex", flowIndex);
-                if (flows[flowIndex].state == FlowState.Registered) {
-                    if (block.timestamp > flows[flowIndex].cliffEnd) {
-                        console.log("before createOrUpdate");
-                        createOrUpdateStream(recipientAddresses[i], flowIndex);
-                        emit FlowStarted(
-                            addr, 
-                            flowIndex, 
-                            _recipients[addr][flowIndex].flowRate, 
-                            _recipients[addr][flowIndex].permanent,
-                            _recipients[addr][flowIndex].state,
-                            _recipients[addr][flowIndex].cliffEnd,
-                            _recipients[addr][flowIndex].vestingDuration,
-                            _recipients[addr][flowIndex].starttime,
-                            _recipients[addr][flowIndex].cliffAmount,
-                            _recipients[addr][flowIndex].ref  
-                        );
+            _launchVestingForAddress(addr);
+        }
+    }
+
+    function launchVestingToSender() public {
+        _launchVestingForAddress(msg.sender);
+    }
+
+    function _launchVestingForAddress(address addr) internal {
+        Flow[] memory flows = _recipients[addr];
+        int96 newFlowRate;
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            console.log("starting on flow with flowIndex", flowIndex);
+            if (flows[flowIndex].state == FlowState.Registered) {
+                if (block.timestamp > flows[flowIndex].cliffEnd) {
+                    newFlowRate = newFlowRate + _recipients[addr][flowIndex].flowRate;
+                    if ( _recipients[addr][flowIndex].cliffAmount > 0 ) {
+                        // @dev send cliff lump sum
+                        acceptedToken.transfer(addr, _recipients[addr][flowIndex].cliffAmount);
                     }
+                    _recipients[addr][flowIndex].state = FlowState.Flowing;
+                    if (_recipients[addr][flowIndex].starttime == 0) {
+                        _recipients[addr][flowIndex].starttime = block.timestamp;
+                    }
+                    emit FlowStarted(
+                        addr, 
+                        flowIndex, 
+                        _recipients[addr][flowIndex].flowRate, 
+                        _recipients[addr][flowIndex].permanent,
+                        _recipients[addr][flowIndex].state,
+                        _recipients[addr][flowIndex].cliffEnd,
+                        _recipients[addr][flowIndex].vestingDuration,
+                        _recipients[addr][flowIndex].starttime,
+                        _recipients[addr][flowIndex].cliffAmount,
+                        _recipients[addr][flowIndex].ref  
+                    );
                 }
             }
         }
-    }
-
-    function createOrUpdateStream(address recipient, uint256 flowIndex) internal {
-        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
-        require(_recipients[recipient][flowIndex].starttime == 0, "!already started");
-        if ( _recipients[recipient][flowIndex].cliffAmount > 0 ) {
-            // send cliff lump sum
-            acceptedToken.transfer(recipient, _recipients[recipient][flowIndex].cliffAmount);
-        }
-        if (outFlowRate == 0) {
-            if (recipient != address(this)) {
-                openStream(recipient, flowIndex);
-            }
-        } else {
-            // increase the outflow by flowRate
-            updateStream(recipient, flowIndex, outFlowRate + _recipients[recipient][flowIndex].flowRate);
-        }
-    }
-
-    function openStream(address recipient, uint256 i) internal {
-        _host.callAgreement(
-            _cfa,
-            abi.encodeWithSelector(
-                _cfa.createFlow.selector,
-                acceptedToken,
-                recipient,
-                _recipients[recipient][i].flowRate,
-                new bytes(0)
-            ),
-            new bytes(0)
-        );
-        _recipients[recipient][i].state = FlowState.Flowing;
-        if (_recipients[recipient][i].starttime == 0) {
-            _recipients[recipient][i].starttime = block.timestamp;
-        }
-        flowRates[recipient] = _recipients[recipient][i].flowRate;
-    }
-
-    function updateStream(address recipient, uint256 i, int96 newFlowRate) internal {
-        _host.callAgreement(
-            _cfa,
-            abi.encodeWithSelector(
-                _cfa.updateFlow.selector,
-                acceptedToken,
-                recipient,
-                newFlowRate,
-                new bytes(0)
-            ),
-            new bytes(0)
-        );
-        _recipients[recipient][i].state = FlowState.Flowing;
-        if (_recipients[recipient][i].starttime == 0) {
-            _recipients[recipient][i].starttime = block.timestamp;
-        }
-        flowRates[recipient] = newFlowRate;
+        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), addr);
+        flowRates[addr] = outFlowRate + newFlowRate;
+        cfaV1.flow(addr, acceptedToken, outFlowRate + newFlowRate);
     }
 
     function elapsedTime(address recipient, uint256 flowIndex) public view returns (uint256) {
-        uint256 elapsed = 0;
         if (_recipients[recipient][flowIndex].starttime > 0) {
-            elapsed = block.timestamp.sub(_recipients[recipient][flowIndex].starttime);
+            return block.timestamp.sub(_recipients[recipient][flowIndex].starttime);
+        } else {
+            return 0;
         }
-        return elapsed;
     }
 
     // for Gelato Network
@@ -295,9 +266,9 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         nextCloseAddress = _addr;
     }
 
-    function closeVesting(address[] calldata recipientAddresses) public atLeastCloser {
-        for(uint i = 0; i < recipientAddresses.length; i++) {
-            address addr = recipientAddresses[i];
+    function closeVesting(address[] calldata targetAddresses) public atLeastCloser {
+        for(uint i = 0; i < targetAddresses.length; i++) {
+            address addr = targetAddresses[i];
             Flow[] memory flows = _recipients[addr];
             for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
                 if (flows[flowIndex].state == FlowState.Flowing) {
@@ -306,17 +277,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                     }
                 }
             }
-        }
-    }
-
-    // TODO: delete this function? no longer needed?
-    function closeOrUpdateStream(address recipient, uint256 flowIndex) internal {
-        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
-        if (outFlowRate == _recipients[recipient][flowIndex].flowRate) {
-            closeStream(recipient, flowIndex);
-        } else if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
-            // decrease the outflow by flowRate
-            updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
         }
     }
 
@@ -334,73 +294,68 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         //console.log("outFlowRate, flowRate for this flow");
         //console.logInt(outFlowRate);
         //console.logInt(_recipients[recipient][flowIndex].flowRate);
-        if (outFlowRate > _recipients[recipient][flowIndex].flowRate) {
-            // decrease the outflow by flowRate
-            //console.log("there is more than one flow, so update it");
-            updateStream(recipient, flowIndex, outFlowRate - _recipients[recipient][flowIndex].flowRate);
-            flowRates[recipient] = outFlowRate - _recipients[recipient][flowIndex].flowRate;
-        } else {
-            //console.log("only flow, so delete it");
-            _host.callAgreement(
-                _cfa,
-                abi.encodeWithSelector(
-                    _cfa.deleteFlow.selector,
-                    acceptedToken,
-                    address(this),
-                    recipient,
-                    new bytes(0)
-                ),
-                new bytes(0)
-            );
-
-            flowRates[recipient] = 0;
-        }
+        cfaV1.flow(recipient, acceptedToken, outFlowRate - _recipients[recipient][flowIndex].flowRate);
+        flowRates[recipient] = outFlowRate - _recipients[recipient][flowIndex].flowRate;
         _recipients[recipient][flowIndex].state = FlowState.Stopped;
-        emit FlowStopped(
-            recipient, 
-            flowIndex, 
-            _recipients[recipient][flowIndex].flowRate, 
-            _recipients[recipient][flowIndex].permanent,
-            _recipients[recipient][flowIndex].state,
-            _recipients[recipient][flowIndex].cliffEnd,
-            _recipients[recipient][flowIndex].vestingDuration,
-            _recipients[recipient][flowIndex].starttime,
-            _recipients[recipient][flowIndex].cliffAmount,
-            _recipients[recipient][flowIndex].ref
-        );
+        _emitFlowStopped(recipient, flowIndex);
     }
 
     function redirectStreams(address oldRecipient, address newRecipient, bytes32 ref) external onlyManager {
         //console.log("start redirectStreams: from, to, ref:->", oldRecipient, newRecipient);
         //console.logBytes32(ref);
         Flow[] memory flows = _recipients[oldRecipient];
+        int96 redirectedFlowRate;
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
             //console.log("starting on flowIndex", flowIndex);
             if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
                 //console.log("passed ref check");
                 if ( flows[flowIndex].state != FlowState.Stopped) {
                     //console.log("state is not stopped");
-                    uint256 newVestingDuration = flows[flowIndex].vestingDuration;
-                    uint256 newCliffAmount = flows[flowIndex].cliffAmount;
-                    uint256 newCliffEnd = flows[flowIndex].cliffEnd;
+                    //uint256 newVestingDuration = flows[flowIndex].vestingDuration;
+                    //uint256 newCliffAmount = flows[flowIndex].cliffAmount;
+                    //uint256 newCliffEnd = flows[flowIndex].cliffEnd;
+                    Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, flows[flowIndex].cliffEnd, flows[flowIndex].vestingDuration, 0, flows[flowIndex].cliffAmount, flows[flowIndex].ref);
                     if ( flows[flowIndex].state == FlowState.Flowing) {
                         //console.log("state is Flowing, ready to close");
-                        _closeStream(oldRecipient, flowIndex);
+                        //_closeStream(oldRecipient, flowIndex);
+                        _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
+                        _emitFlowStopped(oldRecipient, flowIndex);
                         //console.log("after _closeStream");
-                        newCliffEnd = block.timestamp - 1;
-                        newCliffAmount = 0;
-                        newVestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
+                        redirectedFlowRate = redirectedFlowRate + flows[flowIndex].flowRate;
+                        newFlow.cliffEnd = block.timestamp + 1;
+                        newFlow.cliffAmount = 0;
+                        newFlow.vestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
                         //console.log("newVestingDuration", newVestingDuration);
                     } else {
                         _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
                     }
-                    Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, newCliffEnd, newVestingDuration, 0, newCliffAmount, flows[flowIndex].ref);
+                    //Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, newCliffEnd, newVestingDuration, 0, newCliffAmount, flows[flowIndex].ref);
                     //console.log("b4 _registerFlow");
                     _registerFlow(newFlow);
                     //console.log("after _registerFlow");
                 }
             }
         }
+        // @dev reduce or delete flow to oldRecipient
+        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), oldRecipient);
+        cfaV1.flow(oldRecipient, acceptedToken, outFlowRate - redirectedFlowRate);
+        // @dev launch the newly created Flows to newRecipient
+        _launchVestingForAddress(newRecipient);
+    }
+
+    function _emitFlowStopped(address addr, uint256 flowIndex) internal {
+        emit FlowStopped(
+            addr, 
+            flowIndex, 
+            _recipients[addr][flowIndex].flowRate, 
+            _recipients[addr][flowIndex].permanent,
+            _recipients[addr][flowIndex].state,
+            _recipients[addr][flowIndex].cliffEnd,
+            _recipients[addr][flowIndex].vestingDuration,
+            _recipients[addr][flowIndex].starttime,
+            _recipients[addr][flowIndex].cliffAmount,
+            _recipients[addr][flowIndex].ref
+        );
     }
 
     // now this returns an array of {Flow}s
@@ -462,19 +417,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.ref
         );
         if (block.timestamp > newFlow.cliffEnd) {
-            createOrUpdateStream(newFlow.recipient, flowIndex);
-            emit FlowStarted(
-                newFlow.recipient, 
-                flowIndex, 
-                newFlow.flowRate, 
-                newFlow.permanent,
-                newFlow.state,
-                newFlow.cliffEnd,
-                newFlow.vestingDuration,
-                newFlow.starttime,
-                newFlow.cliffAmount,
-                newFlow.ref  
-            );
+            _launchVestingForAddress(newFlow.recipient);
         }
         return newFlow;
     }
