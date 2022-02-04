@@ -98,6 +98,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     bytes32 public constant MANAGER = keccak256("MANAGER_ROLE");
     bytes32 public constant GRANTOR = keccak256("GRANTOR_ROLE");
     bytes32 public constant CLOSER = keccak256("CLOSER_ROLE");
+    bytes32 public constant LAUNCHER = keccak256("LAUNCHER_ROLE");
    
     address admin;
     IVestingFactory factory;
@@ -157,6 +158,15 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         _;
     }
 
+    modifier atLeastLauncher() {
+        require(hasRole(MANAGER,msg.sender) || 
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender) ||
+                hasRole(GRANTOR, msg.sender) ||
+                hasRole(LAUNCHER, msg.sender),
+                "Only allowed by Launcher or Grantor or Manager");
+        _;
+    }
+
     modifier notRegistered(address adr) {
         require(!isRecipientRegistered(adr), "Registered Recipient");
         _;
@@ -173,10 +183,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function launchVesting(address[] calldata targetAddresses) public onlyManager {
-        console.log("start launchVesting");
+        //console.log("start launchVesting");
         for(uint i = 0; i < targetAddresses.length; i++) {
             address addr = targetAddresses[i];
-            console.log("starting on address ", addr);
+            //console.log("starting on address ", addr);
             _launchVestingForAddress(addr);
         }
     }
@@ -185,11 +195,16 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         _launchVestingForAddress(msg.sender);
     }
 
+    function launchVestingForAddress(address addr) public atLeastLauncher {
+        _launchVestingForAddress(addr);
+    }
+
     function _launchVestingForAddress(address addr) internal {
         Flow[] memory flows = _recipients[addr];
         int96 newFlowRate;
+        uint256 launchCount;
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            console.log("starting on flow with flowIndex", flowIndex);
+            //console.log("starting on flow with flowIndex", flowIndex);
             if (flows[flowIndex].state == FlowState.Registered) {
                 if (block.timestamp > flows[flowIndex].cliffEnd) {
                     newFlowRate = newFlowRate + _recipients[addr][flowIndex].flowRate;
@@ -201,19 +216,13 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                     if (_recipients[addr][flowIndex].starttime == 0) {
                         _recipients[addr][flowIndex].starttime = block.timestamp;
                     }
-                    emit FlowStarted(
-                        addr, 
-                        flowIndex, 
-                        _recipients[addr][flowIndex].flowRate, 
-                        _recipients[addr][flowIndex].permanent,
-                        _recipients[addr][flowIndex].state,
-                        _recipients[addr][flowIndex].cliffEnd,
-                        _recipients[addr][flowIndex].vestingDuration,
-                        _recipients[addr][flowIndex].starttime,
-                        _recipients[addr][flowIndex].cliffAmount,
-                        _recipients[addr][flowIndex].ref  
-                    );
+                    _emitFlowStarted(addr, flowIndex);
+                    launchCount++;
                 }
+            }
+            // @dev limit the function 25 flow launches per address
+            if (launchCount > 25) {
+                break;
             }
         }
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), addr);
@@ -246,6 +255,26 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             }
         }
     }
+    function launchReady(address addr) external view returns(bool canExec, bytes memory execPayload) {
+        console.log("start launchReady");
+        Flow[] memory flows = _recipients[addr];
+        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+            console.log("starting on flowIndex", flowIndex);
+            if (flows[flowIndex].state == FlowState.Registered) {
+                console.log("is Registered");
+                if (block.timestamp > flows[flowIndex].cliffEnd) {
+                    console.log("is past cliffEnd");
+                    canExec = true;
+                    execPayload = abi.encodeWithSelector(
+                        this.launchVestingForAddress.selector,
+                        address(addr)
+                    );
+                    break;
+                }
+            }
+        }
+    }
+
     function closeVestingForAddress(address addr) public {
         Flow[] memory flows = _recipients[addr];
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
@@ -358,9 +387,34 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         );
     }
 
+    function _emitFlowStarted(address addr, uint256 flowIndex) internal {
+        emit FlowStarted(
+            addr, 
+            flowIndex, 
+            _recipients[addr][flowIndex].flowRate, 
+            _recipients[addr][flowIndex].permanent,
+            _recipients[addr][flowIndex].state,
+            _recipients[addr][flowIndex].cliffEnd,
+            _recipients[addr][flowIndex].vestingDuration,
+            _recipients[addr][flowIndex].starttime,
+            _recipients[addr][flowIndex].cliffAmount,
+            _recipients[addr][flowIndex].ref
+        );
+    }
+
     // now this returns an array of {Flow}s
     function getFlowRecipient(address adr) public onlyManager view returns (Flow[] memory) {
         return _recipients[adr];
+    }
+
+    function getFlowRecipientPaginated(address adr, uint256 start, uint256 length) public onlyManager view returns (Flow[] memory flows) {
+        if (length > _recipients[adr].length - start) {
+            length = _recipients[adr].length - start;
+        }
+        flows = new Flow[](length);
+        for (uint256 i = 0; i < length; i++) {
+            flows[i] = _recipients[adr][start + i];
+        }
     }
 
     function getAllAddresses() public onlyManager view returns (address[] memory) {
@@ -417,7 +471,19 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
             newFlow.ref
         );
         if (block.timestamp > newFlow.cliffEnd) {
-            _launchVestingForAddress(newFlow.recipient);
+            // @dev launch this flow
+            if ( newFlow.cliffAmount > 0 ) {
+                // @dev send cliff lump sum
+                acceptedToken.transfer(newFlow.recipient, newFlow.cliffAmount);
+            }
+            _recipients[newFlow.recipient][flowIndex].state = FlowState.Flowing;
+            if (_recipients[newFlow.recipient][flowIndex].starttime == 0) {
+                _recipients[newFlow.recipient][flowIndex].starttime = block.timestamp;
+            }
+            _emitFlowStarted(newFlow.recipient, flowIndex);
+            (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), newFlow.recipient);
+            flowRates[newFlow.recipient] = outFlowRate + newFlow.flowRate;
+            cfaV1.flow(newFlow.recipient, acceptedToken, outFlowRate + newFlow.flowRate);
         }
         return newFlow;
     }
@@ -449,11 +515,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function isPermanentFlow(address adr, uint256 flowIndex) internal registeredRecipient(adr) view returns (bool) {
         return _recipients[adr][flowIndex].permanent;
-    }
-
-    // converts a flowRate from int96 to uint256 for math purposes
-    function toUint256(int96 flowRate) internal view returns (uint256) {
-        return uint256(uint96(flowRate));
     }
 
     function flowTokenBalance() public view returns (uint256) {

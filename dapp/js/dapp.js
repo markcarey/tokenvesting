@@ -17,7 +17,7 @@ var showWizard = false;
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xA111617bdC69ED129b2c7041e42d7E1D6C694fD7"; 
-factories.polygon =     "0x86b78Fd33814F89f77e5c3D3c540Bf8E13123034"; // localhost
+factories.polygon =     "0xc4CD146453234a75F75A58F73a5514cC732B9392"; // localhost
 var factoryAddress = factories[chain];
 
 var vestorAddress = "";
@@ -31,7 +31,8 @@ var vestor;
 var roles = {
     MANAGER: web3.utils.keccak256("MANAGER_ROLE"),
     GRANTOR: web3.utils.keccak256("GRANTOR_ROLE"),
-    CLOSER: web3.utils.keccak256("CLOSER_ROLE")
+    CLOSER: web3.utils.keccak256("CLOSER_ROLE"),
+    LAUNCHER: web3.utils.keccak256("LAUNCHER_ROLE")
 };
 
 //const prov = {"url": "https://" + rpcURL};
@@ -67,6 +68,12 @@ if (chain == "mumbai") {
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
     addr.fDAI = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
     addr.fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
+    addr.idleWETH = "0x490B8896ff200D32a100A05B7c0507E492938BBb"; // MOCK
+    addr.idleWETHYield = addr.idleWETH;
+    addr.IdleWETH = addr.idleWETH;
+    addr.idleWETHx = "0x0CCe2C9980711ddc5AA725AF68A10960E49Fd2Ed"; // wrap of MOCK
+    addr.idleWETHYieldx = addr.idleWETHx;
+    addr.IdleWETHx = addr.idleWETHx;
 }
 if (chain == "polygon") {
     //Polygon
@@ -116,7 +123,7 @@ const WETH = new web3.eth.Contract(tokenABI, addr.WETH); // need this?
 const resolver = new web3.eth.Contract(resolverABI, addr.Resolver);
 const cfa = new web3.eth.Contract(cfaABI, addr.cfa);
 
-var gas = web3.utils.toHex(new BN('2000000000')); // 2 Gwei;
+var gas = web3.utils.toHex(new BN('30000000000')); // 30 Gwei;
 var dappChain = 80001; // default to Mumbai
 var userChain;
 var accounts;
@@ -221,7 +228,7 @@ async function afterConnection() {
             recipientAdresses = await vestor.methods.getAllAddresses().call({'from': ethereum.selectedAddress});
             console.log("allAdresses", JSON.stringify(recipientAdresses));
             $.each(recipientAdresses, async function( i, address ) {
-                var flowsForAddress = await vestor.methods.getFlowRecipient(address).call({'from': ethereum.selectedAddress});
+                var flowsForAddress = await vestor.methods.getFlowRecipientPaginated(address, 0, 100).call({'from': ethereum.selectedAddress});
                 console.log("flowsForAddress", JSON.stringify(flowsForAddress));
                 $.each(flowsForAddress, function(j, flow) {
                     console.log("flow", flow);

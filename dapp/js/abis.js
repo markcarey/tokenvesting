@@ -130,1051 +130,1202 @@ const factoryABI = [
     }
   ];
 
-const vestorABI = [
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "int96",
-          "name": "flowRate",
-          "type": "int96"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "permanent",
-          "type": "bool"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum TokenVestor.FlowState",
-          "name": "state",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffEnd",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "vestingDuration",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "starttime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffAmount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "FlowCreated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "int96",
-          "name": "flowRate",
-          "type": "int96"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "permanent",
-          "type": "bool"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum TokenVestor.FlowState",
-          "name": "state",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffEnd",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "vestingDuration",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "starttime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffAmount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "FlowStarted",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "int96",
-          "name": "flowRate",
-          "type": "int96"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "permanent",
-          "type": "bool"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum TokenVestor.FlowState",
-          "name": "state",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffEnd",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "vestingDuration",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "starttime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "cliffAmount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "FlowStopped",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "previousAdminRole",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "newAdminRole",
-          "type": "bytes32"
-        }
-      ],
-      "name": "RoleAdminChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        }
-      ],
-      "name": "RoleGranted",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        }
-      ],
-      "name": "RoleRevoked",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "CLOSER",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "DEFAULT_ADMIN_ROLE",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "GRANTOR",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "MANAGER",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "acceptedToken",
-      "outputs": [
-        {
-          "internalType": "contract ISuperToken",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "adr",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "addRef",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "closeReady",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "canExec",
-          "type": "bool"
-        },
-        {
-          "internalType": "bytes",
-          "name": "execPayload",
-          "type": "bytes"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        }
-      ],
-      "name": "closeStream",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "recipientAddresses",
-          "type": "address[]"
-        }
-      ],
-      "name": "closeVesting",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "addr",
-          "type": "address"
-        }
-      ],
-      "name": "closeVestingForAddress",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IERC20",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "deposit",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "flowIndex",
-          "type": "uint256"
-        }
-      ],
-      "name": "elapsedTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "flowTokenBalance",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getAllAddresses",
-      "outputs": [
-        {
-          "internalType": "address[]",
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "adr",
-          "type": "address"
-        }
-      ],
-      "name": "getFlowRecipient",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "recipient",
-              "type": "address"
-            },
-            {
-              "internalType": "int96",
-              "name": "flowRate",
-              "type": "int96"
-            },
-            {
-              "internalType": "bool",
-              "name": "permanent",
-              "type": "bool"
-            },
-            {
-              "internalType": "enum TokenVestor.FlowState",
-              "name": "state",
-              "type": "uint8"
-            },
-            {
-              "internalType": "uint256",
-              "name": "cliffEnd",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "vestingDuration",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "starttime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "cliffAmount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "ref",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct TokenVestor.Flow[]",
-          "name": "",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getNetFlow",
-      "outputs": [
-        {
-          "internalType": "int96",
-          "name": "",
-          "type": "int96"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getRoleAdmin",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "index",
-          "type": "uint256"
-        }
-      ],
-      "name": "getRoleMember",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getRoleMemberCount",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "grantRole",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "hasRole",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_acceptedToken",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "host",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "cfa",
-          "type": "address"
-        }
-      ],
-      "name": "initialize",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "recipientAddresses",
-          "type": "address[]"
-        }
-      ],
-      "name": "launchVesting",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nextCloseAddress",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nextCloseDate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "oldRecipient",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "newRecipient",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "redirectStreams",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "adr",
-          "type": "address[]"
-        },
-        {
-          "internalType": "int96[]",
-          "name": "flowRate",
-          "type": "int96[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "cliffEnd",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "vestingDuration",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "cliffAmount",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "ref",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "registerBatch",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "adr",
-          "type": "address[]"
-        },
-        {
-          "internalType": "int96[]",
-          "name": "flowRate",
-          "type": "int96[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "cliffEnd",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "vestingDuration",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "cliffAmount",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "ref",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "registerBatchPermanent",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "adr",
-          "type": "address"
-        },
-        {
-          "internalType": "int96",
-          "name": "flowRate",
-          "type": "int96"
-        },
-        {
-          "internalType": "bool",
-          "name": "isPermanent",
-          "type": "bool"
-        },
-        {
-          "internalType": "uint256",
-          "name": "cliffEnd",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "vestingDuration",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "cliffAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "ref",
-          "type": "bytes32"
-        }
-      ],
-      "name": "registerFlow",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "recipient",
-              "type": "address"
-            },
-            {
-              "internalType": "int96",
-              "name": "flowRate",
-              "type": "int96"
-            },
-            {
-              "internalType": "bool",
-              "name": "permanent",
-              "type": "bool"
-            },
-            {
-              "internalType": "enum TokenVestor.FlowState",
-              "name": "state",
-              "type": "uint8"
-            },
-            {
-              "internalType": "uint256",
-              "name": "cliffEnd",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "vestingDuration",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "starttime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "cliffAmount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "ref",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct TokenVestor.Flow",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "renounceRole",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "role",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "revokeRole",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_addr",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_closeDate",
-          "type": "uint256"
-        }
-      ],
-      "name": "setNextClose",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes4",
-          "name": "interfaceId",
-          "type": "bytes4"
-        }
-      ],
-      "name": "supportsInterface",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IERC20",
-          "name": "token",
-          "type": "address"
-        }
-      ],
-      "name": "upgrade",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IERC20",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ];
+const vestorABI =  [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "int96",
+        "name": "flowRate",
+        "type": "int96"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "permanent",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum TokenVestor.FlowState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffEnd",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vestingDuration",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "starttime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FlowCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "int96",
+        "name": "flowRate",
+        "type": "int96"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "permanent",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum TokenVestor.FlowState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffEnd",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vestingDuration",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "starttime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FlowStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "int96",
+        "name": "flowRate",
+        "type": "int96"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "permanent",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum TokenVestor.FlowState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffEnd",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "vestingDuration",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "starttime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cliffAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "FlowStopped",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "previousAdminRole",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "newAdminRole",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RoleAdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "CLOSER",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GRANTOR",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "LAUNCHER",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MANAGER",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "acceptedToken",
+    "outputs": [
+      {
+        "internalType": "contract ISuperToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "adr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "addRef",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cfaV1",
+    "outputs": [
+      {
+        "internalType": "contract ISuperfluid",
+        "name": "host",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IConstantFlowAgreementV1",
+        "name": "cfa",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeReady",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "canExec",
+        "type": "bool"
+      },
+      {
+        "internalType": "bytes",
+        "name": "execPayload",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "closeStream",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "targetAddresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "closeVesting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "closeVestingForAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "deposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "flowIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "elapsedTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "flowTokenBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllAddresses",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "adr",
+        "type": "address"
+      }
+    ],
+    "name": "getFlowRecipient",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "int96",
+            "name": "flowRate",
+            "type": "int96"
+          },
+          {
+            "internalType": "bool",
+            "name": "permanent",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum TokenVestor.FlowState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffEnd",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "vestingDuration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "starttime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "ref",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct TokenVestor.Flow[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "adr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "length",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFlowRecipientPaginated",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "int96",
+            "name": "flowRate",
+            "type": "int96"
+          },
+          {
+            "internalType": "bool",
+            "name": "permanent",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum TokenVestor.FlowState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffEnd",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "vestingDuration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "starttime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "ref",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct TokenVestor.Flow[]",
+        "name": "flows",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNetFlow",
+    "outputs": [
+      {
+        "internalType": "int96",
+        "name": "",
+        "type": "int96"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleAdmin",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "getRoleMember",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleMemberCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "grantRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "hasRole",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_acceptedToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "host",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "cfa",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "launchReady",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "canExec",
+        "type": "bool"
+      },
+      {
+        "internalType": "bytes",
+        "name": "execPayload",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "targetAddresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "launchVesting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "launchVestingForAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "launchVestingToSender",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextCloseAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextCloseDate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "oldRecipient",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newRecipient",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "redirectStreams",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "adr",
+        "type": "address[]"
+      },
+      {
+        "internalType": "int96[]",
+        "name": "flowRate",
+        "type": "int96[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "cliffEnd",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "vestingDuration",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "cliffAmount",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "ref",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "registerBatch",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "adr",
+        "type": "address[]"
+      },
+      {
+        "internalType": "int96[]",
+        "name": "flowRate",
+        "type": "int96[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "cliffEnd",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "vestingDuration",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "cliffAmount",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "ref",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "registerBatchPermanent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "adr",
+        "type": "address"
+      },
+      {
+        "internalType": "int96",
+        "name": "flowRate",
+        "type": "int96"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPermanent",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cliffEnd",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "vestingDuration",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cliffAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "ref",
+        "type": "bytes32"
+      }
+    ],
+    "name": "registerFlow",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "int96",
+            "name": "flowRate",
+            "type": "int96"
+          },
+          {
+            "internalType": "bool",
+            "name": "permanent",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum TokenVestor.FlowState",
+            "name": "state",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffEnd",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "vestingDuration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "starttime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cliffAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "ref",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct TokenVestor.Flow",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "role",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_addr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_closeDate",
+        "type": "uint256"
+      }
+    ],
+    "name": "setNextClose",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "upgrade",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
 
 const superABI = [
     {

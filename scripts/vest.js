@@ -9,7 +9,7 @@ const vestorJSON = require("../artifacts/contracts/TokenVestor.sol/TokenVestor.j
 const { setUncaughtExceptionCaptureCallback } = require('process');
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0x8f678d16918bc16F9EB23259a8A7D4c2Baa26B4e"; // loclahost:polygon
+const vestorAddress = "0x6883C0b7d92C0D88a53329967822bB40e235689F"; // loclahost:polygon
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2221,9 +2221,22 @@ async function launchVesting() {
   console.log("Flows are " + JSON.stringify(flows));
 }
 
+async function claim() {
+  await vestor.launchVestingForSender();
+}
+
+async function launchVestingForAddress(addr) {
+  return await (await vestor.launchVestingForAddress(addr, { gasLimit: 5000000 })).wait();
+}
+
 async function flowTokenBalance() {
   const bal = await vestor.flowTokenBalance();
   console.log("balance is " + JSON.stringify(bal));
+}
+
+async function launchReady(addr) {
+  const ready = await vestor.launchReady(addr);
+  console.log("ready is " + JSON.stringify(ready));
 }
 
 async function estimateTotalTokens(addr) {
@@ -2428,7 +2441,7 @@ async function balanceOf(token, addr) {
  //addFlow()
  //addBatch()
  //redirect()
- //ithdrawAll()
+ //withdrawAll()
  //addBatchCall()
  //getFlows(PUBLIC_KEY)
  //mintSomeWETH()
@@ -2437,7 +2450,7 @@ async function balanceOf(token, addr) {
  //checkBalance()
  //resolve("SuperToken")
  //underlying("0x1748479504a92d69dEb5f5ADd61a17b563d82C15")
- //transaction("0x980ceb39834a3c7f9714df42d7b979c26fceea7299f678b85f5cf49f3a660a8c")
+ //transaction("0xecfb9380ff01f84dd35c6975ceff0b1b02cbb36afd35fbae9595f9b1ad291ab4")
  //getBlock("0x1427066")
  //setTimestamp(1641308985)
  //flowTokenBalance()
@@ -2455,8 +2468,14 @@ async function balanceOf(token, addr) {
  // 
  //balanceOf(addr.WETH, "0xe124a44E9C13F07be177f78ACb5180C005E5FD2F")
  //balanceOf("0x61ADDCd8F9CCf5a978CF09c76E77073Ae37F9563", "0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
- balanceOf(addr.idleWETH, "0x369e06C46790d7174Bd96Da75Db5c2977647Ce11")
+ //balanceOf(addr.idleWETH, "0x369e06C46790d7174Bd96Da75Db5c2977647Ce11")
  //mintSomeWETH()
+ launchReady("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
+ //launchReady("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
+ //launchVestingForAddress("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
+ //claim()
+ 
+
    .then(() => process.exit(0))
    .catch(error => {
      console.error(error);
