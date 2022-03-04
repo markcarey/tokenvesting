@@ -17,7 +17,7 @@ var showWizard = false;
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xA111617bdC69ED129b2c7041e42d7E1D6C694fD7"; 
-factories.polygon =     "0xc4CD146453234a75F75A58F73a5514cC732B9392"; // localhost
+factories.polygon =     "0x720d934D5360E2b5FF25CA3699834437f2D4DB64"; // localhost
 var factoryAddress = factories[chain];
 
 var vestorAddress = "";

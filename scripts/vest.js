@@ -9,7 +9,7 @@ const vestorJSON = require("../artifacts/contracts/TokenVestor.sol/TokenVestor.j
 const { setUncaughtExceptionCaptureCallback } = require('process');
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0x6883C0b7d92C0D88a53329967822bB40e235689F"; // loclahost:polygon
+const vestorAddress = "0xF7dD255aeDb67965320F332316a7f62A53D6dbD0"; // loclahost:polygon
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -2470,9 +2470,9 @@ async function balanceOf(token, addr) {
  //balanceOf("0x61ADDCd8F9CCf5a978CF09c76E77073Ae37F9563", "0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
  //balanceOf(addr.idleWETH, "0x369e06C46790d7174Bd96Da75Db5c2977647Ce11")
  //mintSomeWETH()
- launchReady("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
+ //launchReady("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
  //launchReady("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
- //launchVestingForAddress("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
+ launchVestingForAddress("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
  //claim()
  
 
