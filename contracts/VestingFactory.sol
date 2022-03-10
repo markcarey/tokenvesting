@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-
 import "./TokenVestor.sol";
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
@@ -14,7 +12,6 @@ contract VestingFactory {
     address[] public allVestors;
     mapping(address => address[]) userToVestors;
     mapping(address => address) ownerOfVestor;
-
 
     constructor() {
         tokenImplementation = address(new TokenVestor());
@@ -27,6 +24,7 @@ contract VestingFactory {
         uint
     );
 
+    // @dev deploys a TokenVestor contract
     function createVestor(address _token, address _host, address _cfa) external returns (address) {
         address clone = Clones.clone(tokenImplementation);
         TokenVestor(clone).initialize(_token, msg.sender, _host, _cfa);
@@ -37,18 +35,18 @@ contract VestingFactory {
         return clone;
     }
 
-    // should be called only by TokenVestor contract
+    // @dev should be called only by TokenVestor contract
     function addUser(address user) external returns (bool) {
         userToVestors[user].push(msg.sender);
         return true;
     }
 
-    // returns array of all TokenVestor contract addresses
+    // @dev returns array of all TokenVestor contract addresses
     function getAllVestors() public view returns (address[] memory){
        return allVestors;
     }
 
-    // returns array of all TokenVestor contract addresses for a specified user address
+    // @dev returns array of all TokenVestor contract addresses for a specified user address
     function getVestorsForUser(address user) public view returns (address[] memory){
        return userToVestors[user];
     }

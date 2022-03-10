@@ -61,7 +61,7 @@ library CFAv1Library {
         }
     }
 
-     //create flow without userData
+    //create flow without userData
     function createFlow(
         InitData storage cfaLibrary,
         address receiver,
@@ -273,7 +273,7 @@ library CFAv1Library {
         );
     }
 
-  //update flow with ctx but without userData 
+    //update flow with ctx but without userData 
     function updateFlowWithCtx(
         InitData storage cfaLibrary,
         bytes memory ctx,
@@ -318,7 +318,7 @@ library CFAv1Library {
         );
     }
 
-  //delete flow with ctx 
+    //delete flow with ctx 
     function deleteFlowWithCtx(
         InitData storage cfaLibrary,
         bytes memory ctx,

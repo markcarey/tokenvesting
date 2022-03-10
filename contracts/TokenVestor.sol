@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-//import "hardhat/console.sol";
-
 import {
     ISuperfluid,
     ISuperToken,
@@ -123,11 +121,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         nextCloseDate = 2524608000;
 
         //Access Control
-        // console.log("before any role granting");
-        //_setupRole(DEFAULT_ADMIN_ROLE, address(this));
-        // console.log("before grant default to admin");
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
-        // console.log("after granting DEFAULT admin role");
         _setupRole(MANAGER, admin);
         _setupRole(MANAGER, address(this));
         _setupRole(GRANTOR, admin);
@@ -183,10 +177,8 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function launchVesting(address[] calldata targetAddresses) public onlyManager {
-        //// console.log("start launchVesting");
         for(uint i = 0; i < targetAddresses.length; i++) {
             address addr = targetAddresses[i];
-            //// console.log("starting on address ", addr);
             _launchVestingForAddress(addr);
         }
     }
@@ -204,7 +196,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         int96 newFlowRate;
         uint256 launchCount;
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            //// console.log("starting on flow with flowIndex", flowIndex);
             if (flows[flowIndex].state == FlowState.Registered) {
                 if (block.timestamp > flows[flowIndex].cliffEnd) {
                     newFlowRate = newFlowRate + _recipients[addr][flowIndex].flowRate;
@@ -232,10 +223,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         if ( newFlowRate > 0 ) {
             (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), addr);
             flowRates[addr] = outFlowRate + newFlowRate;
-            //console.log(launchCount);
-            //console.log(addr);
-            //console.logInt(outFlowRate);
-            //console.logInt(newFlowRate);
             cfaV1.flow(addr, acceptedToken, outFlowRate + newFlowRate);
         }
     }
@@ -266,14 +253,10 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         }
     }
     function launchReady(address addr) external view returns(bool canExec, bytes memory execPayload) {
-        // console.log("start launchReady");
         Flow[] memory flows = _recipients[addr];
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            // console.log("starting on flowIndex", flowIndex);
             if (flows[flowIndex].state == FlowState.Registered) {
-                // console.log("is Registered");
                 if (block.timestamp > flows[flowIndex].cliffEnd) {
-                    // console.log("is past cliffEnd");
                     canExec = true;
                     execPayload = abi.encodeWithSelector(
                         this.launchVestingForAddress.selector,
@@ -294,7 +277,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
                 }
             }
         }
-        // now update nextCloseAddress (expensive?)
+        // @dev now update nextCloseAddress (expensive?)
         nextCloseAddress = findNextCloseAddress();
     }
 
@@ -330,9 +313,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function _closeStream(address recipient, uint256 flowIndex) internal {
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), recipient);
-        //// console.log("outFlowRate, flowRate for this flow");
-        //// console.logInt(outFlowRate);
-        //// console.logInt(_recipients[recipient][flowIndex].flowRate);
         cfaV1.flow(recipient, acceptedToken, outFlowRate - _recipients[recipient][flowIndex].flowRate);
         flowRates[recipient] = outFlowRate - _recipients[recipient][flowIndex].flowRate;
         _recipients[recipient][flowIndex].state = FlowState.Stopped;
@@ -340,51 +320,33 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function redirectStreams(address oldRecipient, address newRecipient, bytes32 ref) external onlyManager {
-        //// console.log("start redirectStreams: from, to, ref:->", oldRecipient, newRecipient);
-        //// console.logBytes32(ref);
         Flow[] memory flows = _recipients[oldRecipient];
         int96 redirectedFlowRate;
         for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            //// console.log("starting on flowIndex", flowIndex);
             if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
-                //console.log("passed ref check");
-                //console.logBytes32(ref);
                 if ( flows[flowIndex].state != FlowState.Stopped) {
-                    //// console.log("state is not stopped");
-                    //uint256 newVestingDuration = flows[flowIndex].vestingDuration;
-                    //uint256 newCliffAmount = flows[flowIndex].cliffAmount;
-                    //uint256 newCliffEnd = flows[flowIndex].cliffEnd;
                     Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, flows[flowIndex].cliffEnd, flows[flowIndex].vestingDuration, 0, flows[flowIndex].cliffAmount, flows[flowIndex].ref);
                     if ( flows[flowIndex].state == FlowState.Flowing) {
-                        //// console.log("state is Flowing, ready to close");
-                        //_closeStream(oldRecipient, flowIndex);
                         _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
                         _emitFlowStopped(oldRecipient, flowIndex);
-                        //// console.log("after _closeStream");
                         redirectedFlowRate = redirectedFlowRate + flows[flowIndex].flowRate;
                         newFlow.cliffEnd = block.timestamp + 1;
                         newFlow.cliffAmount = 0;
                         newFlow.vestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
-                        //// console.log("newVestingDuration", newVestingDuration);
                     } else if ( flows[flowIndex].state == FlowState.Registered) {
-                        // flow exists but not yet started, bump start date to prevent auto-launch
+                        // @dev flow exists but not yet started, bump start date to prevent auto-launch
                         _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
                         newFlow.cliffEnd = block.timestamp + 1;
                     } else {
-                        // already stopped so don't redirect
+                        // @dev already stopped so don't redirect
                         continue;
                     }
-                    //Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, newCliffEnd, newVestingDuration, 0, newCliffAmount, flows[flowIndex].ref);
-                    //console.log("b4 _registerFlow");
                     _registerFlow(newFlow, false);
-                    //console.log("after _registerFlow");
                 }
             }
         }
         // @dev reduce or delete flow to oldRecipient
         (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), oldRecipient);
-        //console.logInt(outFlowRate);
-        //console.logInt(redirectedFlowRate);
         cfaV1.flow(oldRecipient, acceptedToken, outFlowRate - redirectedFlowRate);
         // @dev launch the newly created Flows to newRecipient
         _launchVestingForAddress(newRecipient);
@@ -420,7 +382,7 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
         );
     }
 
-    // now this returns an array of {Flow}s
+    // @dev returns an array of {Flow}s
     function getFlowRecipient(address adr) public view returns (Flow[] memory) {
         return _recipients[adr];
     }
@@ -460,7 +422,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function registerBatch(address[] calldata adr, int96[] calldata flowRate, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount, bytes32[] calldata ref) public atLeastGrantor {
-        //TODO: check that lengths match
         for(uint i = 0; i < adr.length; i++) {
             Flow memory newFlow = Flow(adr[i], flowRate[i], false, FlowState.Registered, cliffEnd[i], vestingDuration[i], 0, cliffAmount[i], ref[i]);
             _registerFlow(newFlow, true);
@@ -468,7 +429,6 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
     }
 
     function registerBatchPermanent(address[] calldata adr, int96[] calldata flowRate, uint256[] calldata cliffEnd, uint256[] calldata vestingDuration, uint256[] calldata cliffAmount, bytes32[] calldata ref) public atLeastGrantor {
-        //TODO: check that lengths match
         for(uint i = 0; i < adr.length; i++) {
             Flow memory newFlow = Flow(adr[i], flowRate[i], true, FlowState.Registered, cliffEnd[i], vestingDuration[i], 0, cliffAmount[i], ref[i]);
             _registerFlow(newFlow, true);
