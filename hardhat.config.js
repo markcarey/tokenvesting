@@ -5,7 +5,7 @@ require('dotenv').config();
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-web3");
-const { API_URL, RINKEBY_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY, POLYSCAN_API_KEY } = process.env;
+const { API_URL, RINKEBY_API_URL, POLYGON_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY, POLYSCAN_API_KEY } = process.env;
 module.exports = {
   solidity: {
     version: "0.8.0",
@@ -33,6 +33,10 @@ module.exports = {
         accounts: [`0x${PRIVATE_KEY}`],
         gasMultiplier: 3,
         gasPrice: 1000000000 * 2
+     },
+     polygon: {
+        url: POLYGON_API_URL,
+        accounts: [`0x${PRIVATE_KEY}`]
      },
      rinkeby: {
       url: RINKEBY_API_URL,

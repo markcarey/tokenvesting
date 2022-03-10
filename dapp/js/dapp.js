@@ -1,4 +1,4 @@
-var chain = "mumbai";
+var chain = "polygon";
 
 var rpcURLs = {};
 rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57";
@@ -17,7 +17,7 @@ var showWizard = false;
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xc299aF935EAEc6A687f209397AD9613E28048fb5"; 
-factories.polygon =     "0x720d934D5360E2b5FF25CA3699834437f2D4DB64"; // localhost
+factories.polygon =     "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7"; // polygon mainnet
 var factoryAddress = factories[chain];
 
 var vestorAddress = "";
