@@ -1,22 +1,22 @@
-var chain = "polygon";
+var chain = "mumbai";
 
 var rpcURLs = {};
 rpcURLs.rinkeby = "eth-rinkeby.alchemyapi.io/v2/n_mDCfTpJ8I959arPP7PwiOptjubLm57";
 rpcURLs.mumbai = "polygon-mumbai.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 rpcURLs.polygon = "polygon-mainnet.g.alchemy.com/v2/Ptsa6JdQQUtTbRGM1Elvw_ed3cTszLoj";
 
-rpcURLs.polygon = "localhost:8545";  // CHANGE THIS!!!!!!
+//rpcURLs.polygon = "localhost:8545";  // CHANGE THIS!!!!!!
 var rpcURL = rpcURLs[chain];
 
-//var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
-var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
+var web3 = AlchemyWeb3.createAlchemyWeb3("wss://" + rpcURL);
+//var web3 = AlchemyWeb3.createAlchemyWeb3("http://localhost:8545");
 var BN = web3.utils.BN;
 
 var showWizard = false;
 
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
-factories.mumbai =      "0xA111617bdC69ED129b2c7041e42d7E1D6C694fD7"; 
+factories.mumbai =      "0xc299aF935EAEc6A687f209397AD9613E28048fb5"; 
 factories.polygon =     "0x720d934D5360E2b5FF25CA3699834437f2D4DB64"; // localhost
 var factoryAddress = factories[chain];
 
@@ -35,8 +35,8 @@ var roles = {
     LAUNCHER: web3.utils.keccak256("LAUNCHER_ROLE")
 };
 
-//const prov = {"url": "https://" + rpcURL};
-const prov = {"url": "http://" + rpcURL};       // localhost only
+const prov = {"url": "https://" + rpcURL};
+//const prov = {"url": "http://" + rpcURL};       // localhost only
 var provider = new ethers.providers.JsonRpcProvider(prov);
 
 var recipientAdresses = [];
