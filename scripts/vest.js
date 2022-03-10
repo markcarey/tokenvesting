@@ -9,7 +9,7 @@ const vestorJSON = require("../artifacts/contracts/TokenVestor.sol/TokenVestor.j
 const { setUncaughtExceptionCaptureCallback } = require('process');
 
 const factoryAddress = "0xFF1eEde73A7E094F98572Ca9e48593c7238c2F65";
-const vestorAddress = "0xF7dD255aeDb67965320F332316a7f62A53D6dbD0"; // loclahost:polygon
+const vestorAddress = "0xd718d66D0917f80Af45dC13d58001541FB865FCe"; // mumbai
 
 const resolverAddress = "0x8C54C83FbDe3C59e59dd6E324531FB93d4F504d3";
 
@@ -18,6 +18,7 @@ const cfaAddress = "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873"; // mumbai
 const MANAGER = web3.utils.keccak256("MANAGER_ROLE");
 const GRANTOR = web3.utils.keccak256("GRANTOR_ROLE");
 const CLOSER = web3.utils.keccak256("CLOSER_ROLE");
+const LAUNCHER = web3.utils.keccak256("LAUNCHER_ROLE");
 
 const resolverABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"role","type":"bytes32"},{"indexed":true,"internalType":"bytes32","name":"previousAdminRole","type":"bytes32"},{"indexed":true,"internalType":"bytes32","name":"newAdminRole","type":"bytes32"}],"name":"RoleAdminChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"role","type":"bytes32"},{"indexed":true,"internalType":"address","name":"account","type":"address"},{"indexed":true,"internalType":"address","name":"sender","type":"address"}],"name":"RoleGranted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"role","type":"bytes32"},{"indexed":true,"internalType":"address","name":"account","type":"address"},{"indexed":true,"internalType":"address","name":"sender","type":"address"}],"name":"RoleRevoked","type":"event"},{"inputs":[],"name":"DEFAULT_ADMIN_ROLE","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"}],"name":"get","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"}],"name":"getRoleAdmin","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"getRoleMember","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"}],"name":"getRoleMemberCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"},{"internalType":"address","name":"account","type":"address"}],"name":"grantRole","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"},{"internalType":"address","name":"account","type":"address"}],"name":"hasRole","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"},{"internalType":"address","name":"account","type":"address"}],"name":"renounceRole","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"role","type":"bytes32"},{"internalType":"address","name":"account","type":"address"}],"name":"revokeRole","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"target","type":"address"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
@@ -2457,6 +2458,7 @@ async function balanceOf(token, addr) {
  //vestorFlow()
  //getFlow()
  //grantRole(MANAGER, "0x16C63df4C1915C0c4Da929fcA9fB7D83CAAE9A67")
+ grantRole(MANAGER, "0xFe341be90f9c2Cc7e65Ef4e820f632aB6495b85E")
  //estimateTotalTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //estimateRemainingTokens("0x09A900eB2ff6e9AcA12d4d1a396DdC9bE0307661")
  //getSome(addr.fDAI, "0xae1c976a25c6d0dccb5f1a7a9cdf81e518b27942")
@@ -2472,7 +2474,7 @@ async function balanceOf(token, addr) {
  //mintSomeWETH()
  //launchReady("0xFa083DfD09F3a7380f6dF6E25dd277E2780de41D")
  //launchReady("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
- launchVestingForAddress("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
+ //launchVestingForAddress("0x2C61B8e23c2128a05C6EA2D1Ac0622531b1afcF7")
  //claim()
  
 
