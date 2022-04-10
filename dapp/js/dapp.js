@@ -16,7 +16,7 @@ var showWizard = false;
 
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
-factories.mumbai =      "0xc299aF935EAEc6A687f209397AD9613E28048fb5"; 
+factories.mumbai =      "0xA730Af4944ef22a1f45f43c7D504a0C4eE285ebA"; 
 factories.polygon =     "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7"; // polygon mainnet
 var factoryAddress = factories[chain];
 
@@ -68,6 +68,8 @@ if (chain == "mumbai") {
     addr.USDC = "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e";
     addr.fDAI = "0x15F0Ca26781C3852f8166eD2ebce5D18265cceb7";
     addr.fDAIx = "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
+    addr.ETHx = "0x7dA8ba196E747eec76246726Dc5BFC8a459BCD3e";
+    addr.WETHx = addr.ETHx;
     addr.idleWETH = "0x490B8896ff200D32a100A05B7c0507E492938BBb"; // MOCK
     addr.idleWETHYield = addr.idleWETH;
     addr.IdleWETH = addr.idleWETH;
