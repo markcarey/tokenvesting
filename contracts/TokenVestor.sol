@@ -321,35 +321,37 @@ contract TokenVestor is Initializable, AccessControlEnumerableUpgradeable {
 
     function redirectStreams(address oldRecipient, address newRecipient, bytes32 ref) external onlyManager {
         Flow[] memory flows = _recipients[oldRecipient];
-        int96 redirectedFlowRate;
-        for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
-            if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
-                if ( flows[flowIndex].state != FlowState.Stopped) {
-                    Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, flows[flowIndex].cliffEnd, flows[flowIndex].vestingDuration, 0, flows[flowIndex].cliffAmount, flows[flowIndex].ref);
-                    if ( flows[flowIndex].state == FlowState.Flowing) {
-                        _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
-                        _emitFlowStopped(oldRecipient, flowIndex);
-                        redirectedFlowRate = redirectedFlowRate + flows[flowIndex].flowRate;
-                        newFlow.cliffEnd = block.timestamp + 1;
-                        newFlow.cliffAmount = 0;
-                        newFlow.vestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
-                    } else if ( flows[flowIndex].state == FlowState.Registered) {
-                        // @dev flow exists but not yet started, bump start date to prevent auto-launch
-                        _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
-                        newFlow.cliffEnd = block.timestamp + 1;
-                    } else {
-                        // @dev already stopped so don't redirect
-                        continue;
+        if (flows.length > 0) {
+            int96 redirectedFlowRate;
+            for (uint256 flowIndex = 0; flowIndex < flows.length; flowIndex++) {
+                if ( ref == bytes32(0) || ref == flows[flowIndex].ref ) {
+                    if ( flows[flowIndex].state != FlowState.Stopped) {
+                        Flow memory newFlow = Flow(newRecipient, flows[flowIndex].flowRate, false, FlowState.Registered, flows[flowIndex].cliffEnd, flows[flowIndex].vestingDuration, 0, flows[flowIndex].cliffAmount, flows[flowIndex].ref);
+                        if ( flows[flowIndex].state == FlowState.Flowing) {
+                            _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
+                            _emitFlowStopped(oldRecipient, flowIndex);
+                            redirectedFlowRate = redirectedFlowRate + flows[flowIndex].flowRate;
+                            newFlow.cliffEnd = block.timestamp + 1;
+                            newFlow.cliffAmount = 0;
+                            newFlow.vestingDuration = flows[flowIndex].vestingDuration.sub(elapsedTime(oldRecipient, flowIndex));
+                        } else if ( flows[flowIndex].state == FlowState.Registered) {
+                            // @dev flow exists but not yet started, bump start date to prevent auto-launch
+                            _recipients[oldRecipient][flowIndex].state = FlowState.Stopped;
+                            newFlow.cliffEnd = block.timestamp + 1;
+                        } else {
+                            // @dev already stopped so don't redirect
+                            continue;
+                        }
+                        _registerFlow(newFlow, false);
                     }
-                    _registerFlow(newFlow, false);
                 }
             }
+            // @dev reduce or delete flow to oldRecipient
+            (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), oldRecipient);
+            cfaV1.flow(oldRecipient, acceptedToken, outFlowRate - redirectedFlowRate);
+            // @dev launch the newly created Flows to newRecipient
+            _launchVestingForAddress(newRecipient);
         }
-        // @dev reduce or delete flow to oldRecipient
-        (, int96 outFlowRate, , ) = _cfa.getFlow(acceptedToken, address(this), oldRecipient);
-        cfaV1.flow(oldRecipient, acceptedToken, outFlowRate - redirectedFlowRate);
-        // @dev launch the newly created Flows to newRecipient
-        _launchVestingForAddress(newRecipient);
     }
 
     function _emitFlowStopped(address addr, uint256 flowIndex) internal {
