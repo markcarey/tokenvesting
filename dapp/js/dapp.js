@@ -17,7 +17,8 @@ var showWizard = false;
 var factories = {};
 factories.rinkeby =     "0x4e119db6354Fd538e365694291A803f52B50A59d"; 
 factories.mumbai =      "0xA730Af4944ef22a1f45f43c7D504a0C4eE285ebA"; 
-factories.polygon =     "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7"; // polygon mainnet
+//factories.polygon =     "0x70210B719b90BcA3D81cb8026BFC8677F65EB1d7"; // polygon mainnet
+factories.polygon = "0x70dd79Dc80e7aeCD00445F5827744397ee7F256E"; //v2 deployed July 27th, 2022
 var factoryAddress = factories[chain];
 
 var vestorAddress = "";
