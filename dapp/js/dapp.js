@@ -127,6 +127,7 @@ const resolver = new web3.eth.Contract(resolverABI, addr.Resolver);
 const cfa = new web3.eth.Contract(cfaABI, addr.cfa);
 
 var gas = web3.utils.toHex(new BN('30000000000')); // 30 Gwei;
+gas = null; // let wallet decide
 var dappChain = 80001; // default to Mumbai
 var userChain;
 var accounts;
